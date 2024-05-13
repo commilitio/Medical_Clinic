@@ -1,7 +1,6 @@
 package com.commilitio.medicalclinic.model;
 
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Data
