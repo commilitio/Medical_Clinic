@@ -14,7 +14,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
 
     public List<Patient> getPatients(){
-        return patientRepository.getPatientList();
+        return patientRepository.getPatients();
     }
 
     public Patient getPatient(String email){
@@ -32,7 +32,19 @@ public class PatientService {
     }
 
     public Patient updatePatient(String email, Patient patient) {
-        return patientRepository.updatePatient(email, patient)
+        Patient patientToUpdate = patientRepository.getPatient(email)
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found."));
+        patientToUpdate.setEmail(patient.getEmail());
+        patientToUpdate.setPassword(patient.getPassword());
+        patientToUpdate.setIdCardNo(patient.getIdCardNo());
+        patientToUpdate.setFirstName(patient.getFirstName());
+        patientToUpdate.setLastName(patient.getLastName());
+        patientToUpdate.setPhoneNumber(patient.getPhoneNumber());
+        patientToUpdate.setBirthdate(patient.getBirthdate());
+        return patientToUpdate;
+    }
+
+    public Patient updatePassword(String email, String password) {
+        return patientRepository.updatePassword(email, password);
     }
 }

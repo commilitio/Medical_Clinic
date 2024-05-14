@@ -13,79 +13,47 @@ import java.util.Optional;
 @Repository
 public class PatientRepository {
 
-    private final List<Patient> patientList;
+    private final List<Patient> patients;
 
     public Optional<Patient> getPatient(String email) {
-        return Optional.of((Patient) patientList.stream()
-                .filter(patient -> patient.getEmail().equals(email)));
+        return patients.stream()
+                .filter(patient -> patient.getEmail().equals(email))
+                .findFirst();
     }
 
     public Optional<Patient> addPatient(Patient patient) {
-        boolean patientExists = patientList.stream()
-                .anyMatch(existingPatient -> existingPatient.getIdCardNo().equals(patient.getIdCardNo()));
+        boolean patientExists = patients.stream()
+                .anyMatch(existingPatient -> existingPatient.getEmail().equals(patient.getEmail()));
 
         if (patientExists) {
-            System.out.println("Patient already exists.");
-            return Optional.empty();
+            throw new IllegalArgumentException("Patient already exists.");
         } else {
-            patientList.add(patient);
+            patients.add(patient);
             System.out.println("Patient successfully added.");
             return Optional.of(patient);
         }
     }
 
     public void deletePatient(String email) {
-        Optional<Patient> patientToDelete = patientList.stream()
+        Optional<Patient> patientToDelete = patients.stream()
                 .filter(patient -> patient.getEmail().equals(email))
                 .findFirst();
 
         if (patientToDelete.isEmpty()) {
-            System.out.println("Patient not found.");
+            throw new IllegalArgumentException("Patient not found.");
         } else {
-            patientList.remove(patientToDelete.get());
+            patients.remove(patientToDelete.get());
             System.out.println("Patient successfully deleted.");
         }
     }
 
-    public Optional<Patient> updatePatient(String email, Patient patient) {
-        Optional<Patient> patientToUpdate = patientList.stream()
-                .filter(element -> element.getEmail().equals(email))
-                .findFirst();
+    public Patient updatePassword(String email, String password) {
+        Patient updatedPatient = patients.stream()
+                .filter(patient -> patient.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
 
-        if (patientToUpdate.isEmpty()) {
-            System.out.println("Patient not found.");
-            return Optional.empty();
-        } else {
-            patientToUpdate.get().setEmail(patient.getEmail());
-            patientToUpdate.get().setPassword(patient.getPassword());
-            patientToUpdate.get().setIdCardNo(patient.getIdCardNo());
-            patientToUpdate.get().setFirstName(patient.getFirstName());
-            patientToUpdate.get().setLastName(patient.getLastName());
-            patientToUpdate.get().setPhoneNumber(patient.getPhoneNumber());
-            patientToUpdate.get().setBirthdate(patient.getBirthdate());
-        }
-        return patientToUpdate;
+        updatedPatient.setPassword(password);
+        return updatedPatient;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

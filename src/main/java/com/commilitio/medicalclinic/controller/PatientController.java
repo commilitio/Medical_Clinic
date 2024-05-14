@@ -38,4 +38,9 @@ public class PatientController {
     public Patient updatePatient(@PathVariable String email, @RequestBody Patient patient) {
         return patientService.updatePatient(email, patient);
     }
+
+    @PatchMapping("/{email}")
+    public Patient updatePassword(@PathVariable String email, @RequestBody String password) {
+        return patientService.updatePassword(email, password);
+    }
 }
