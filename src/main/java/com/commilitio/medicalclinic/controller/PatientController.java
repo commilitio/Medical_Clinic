@@ -1,10 +1,10 @@
 package com.commilitio.medicalclinic.controller;
 
 import com.commilitio.medicalclinic.model.Patient;
+import com.commilitio.medicalclinic.model.PatientDto;
 import com.commilitio.medicalclinic.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -15,12 +15,12 @@ public class PatientController {
     private final PatientService patientService;
 
     @GetMapping
-    public List<Patient> getPatients() {
+    public List<PatientDto> getPatients() {
         return patientService.getPatients();
     }
 
     @GetMapping("/{email}")
-    public Patient getPatient(@PathVariable String email) {
+    public PatientDto getPatient(@PathVariable String email) {
         return patientService.getPatient(email);
     }
 
@@ -35,7 +35,7 @@ public class PatientController {
     }
 
     @PutMapping("/{email}")
-    public Patient updatePatient(@PathVariable String email, @RequestBody Patient patient) {
+    public PatientDto updatePatient(@PathVariable String email, @RequestBody Patient patient) {
         return patientService.updatePatient(email, patient);
     }
 
