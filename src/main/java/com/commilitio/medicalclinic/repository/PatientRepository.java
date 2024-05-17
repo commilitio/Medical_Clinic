@@ -46,6 +46,19 @@ public class PatientRepository {
         }
     }
 
+    public Patient updatePatient(String email, Patient patient) {
+        Patient patientToUpdate = this.getPatient(email)
+                .orElseThrow(() -> new IllegalArgumentException("Patient not found."));
+        patientToUpdate.setEmail(patient.getEmail());
+        patientToUpdate.setPassword(patient.getPassword());
+        patientToUpdate.setIdCardNo(patient.getIdCardNo());
+        patientToUpdate.setFirstName(patient.getFirstName());
+        patientToUpdate.setLastName(patient.getLastName());
+        patientToUpdate.setPhoneNumber(patient.getPhoneNumber());
+        patientToUpdate.setBirthdate(patient.getBirthdate());
+        return patientToUpdate;
+    }
+
     public Patient updatePassword(String email, String password) {
         Patient updatedPatient = patients.stream()
                 .filter(patient -> patient.getEmail().equals(email))
