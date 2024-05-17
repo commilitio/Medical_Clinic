@@ -30,14 +30,19 @@ public class PatientService {
     }
 
     public void deletePatient(String email) {
-        patientRepository.deletePatient(email);
+        boolean isDeleted = patientRepository.deletePatient(email);
+        if (!isDeleted) {
+            throw new IllegalArgumentException("Operation failed.");
+        }
     }
 
     public PatientDto updatePatient(String email, Patient patient) {
-        return patientMapper.patientToPatientDto(patientRepository.updatePatient(email, patient));
+        return patientMapper.patientToPatientDto(patientRepository.updatePatient(email, patient)
+                .orElseThrow(() -> new IllegalArgumentException("Password not updated.")));
     }
 
     public Patient updatePassword(String email, String password) {
-        return patientRepository.updatePassword(email, password);
+        return patientRepository.updatePassword(email, password)
+                .orElseThrow(() -> new IllegalArgumentException("Password not updated."));
     }
 }

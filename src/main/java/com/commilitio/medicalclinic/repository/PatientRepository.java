@@ -4,6 +4,7 @@ import com.commilitio.medicalclinic.model.Patient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,49 +24,43 @@ public class PatientRepository {
     public Optional<Patient> addPatient(Patient patient) {
         boolean patientExists = patients.stream()
                 .anyMatch(existingPatient -> existingPatient.getEmail().equals(patient.getEmail()));
-
         if (patientExists) {
-            throw new IllegalArgumentException("Patient already exists.");
-        } else {
-            patients.add(patient);
-            System.out.println("Patient successfully added.");
-            return Optional.of(patient);
+            return Optional.empty();
         }
+        patients.add(patient);
+        return Optional.of(patient);
     }
 
-    public void deletePatient(String email) {
-        Optional<Patient> patientToDelete = patients.stream()
-                .filter(patient -> patient.getEmail().equals(email))
-                .findFirst();
-
-        if (patientToDelete.isEmpty()) {
-            throw new IllegalArgumentException("Patient not found.");
-        } else {
+    public boolean deletePatient(String email) {
+        Optional<Patient> patientToDelete = getPatient(email);
+        if (patientToDelete.isPresent()) {
             patients.remove(patientToDelete.get());
-            System.out.println("Patient successfully deleted.");
+            return true;
         }
+        return false;
     }
 
-    public Patient updatePatient(String email, Patient patient) {
-        Patient patientToUpdate = this.getPatient(email)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found."));
-        patientToUpdate.setEmail(patient.getEmail());
-        patientToUpdate.setPassword(patient.getPassword());
-        patientToUpdate.setIdCardNo(patient.getIdCardNo());
-        patientToUpdate.setFirstName(patient.getFirstName());
-        patientToUpdate.setLastName(patient.getLastName());
-        patientToUpdate.setPhoneNumber(patient.getPhoneNumber());
-        patientToUpdate.setBirthdate(patient.getBirthdate());
-        return patientToUpdate;
+    public Optional<Patient> updatePatient(String email, Patient patient) {
+        Optional<Patient> patientToUpdate = getPatient(email);
+        if (patientToUpdate.isPresent()) {
+            patientToUpdate.get().setEmail(patient.getEmail());
+            patientToUpdate.get().setPassword(patient.getPassword());
+            patientToUpdate.get().setIdCardNo(patient.getIdCardNo());
+            patientToUpdate.get().setFirstName(patient.getFirstName());
+            patientToUpdate.get().setLastName(patient.getLastName());
+            patientToUpdate.get().setPhoneNumber(patient.getPhoneNumber());
+            patientToUpdate.get().setBirthdate(patient.getBirthdate());
+            return patientToUpdate;
+        }
+        return Optional.empty();
     }
 
-    public Patient updatePassword(String email, String password) {
-        Patient updatedPatient = patients.stream()
-                .filter(patient -> patient.getEmail().equals(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found"));
-
-        updatedPatient.setPassword(password);
-        return updatedPatient;
+    public Optional<Patient> updatePassword(String email, String password) {
+        Optional<Patient> patientToUpdate = getPatient(email);
+        if (patientToUpdate.isPresent()) {
+            patientToUpdate.get().setPassword(password);
+            return patientToUpdate;
+        }
+        return Optional.empty();
     }
 }
