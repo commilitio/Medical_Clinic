@@ -6,6 +6,8 @@ import com.commilitio.medicalclinic.model.PatientDto;
 import com.commilitio.medicalclinic.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -15,34 +17,50 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
 
-    public List<PatientDto> getPatients(){
-        return patientMapper.mapListToDto(patientRepository.getPatients());
+    public List<PatientDto> getPatients() {
+        List<Patient> patients = patientRepository.findAll();
+        return patientMapper.toDtos(patients);
     }
 
-    public PatientDto getPatient(String email){
-        return patientMapper.patientToPatientDto(patientRepository.getPatient(email)
-                .orElseThrow(() -> new IllegalArgumentException("Patient Not Found.")));
+    public PatientDto getPatient(String email) {
+        Patient patient = patientRepository.findPatientByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Patient Not Found."));
+        return patientMapper.toDto(patient);
     }
 
+    @Transactional
     public PatientDto addPatient(Patient patient) {
-        return patientMapper.patientToPatientDto(patientRepository.addPatient(patient)
-                .orElseThrow(() -> new IllegalArgumentException("Operation failed.")));
+        boolean patientExists = patientRepository
+                .findPatientByEmail(patient.getEmail())
+                .isPresent();
+        if (patientExists) {
+            throw new IllegalArgumentException("Patient already exists.");
+        }
+        Patient addedPatient = patientRepository.save(patient);
+        return patientMapper.toDto(addedPatient);
     }
 
     public void deletePatient(String email) {
-        boolean isDeleted = patientRepository.deletePatient(email);
-        if (!isDeleted) {
-            throw new IllegalArgumentException("Operation failed.");
-        }
+        Patient patient = patientRepository.findPatientByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Patient Not Found."));
+        patientRepository.delete(patient);
     }
 
+    @Transactional
     public PatientDto updatePatient(String email, Patient patient) {
-        return patientMapper.patientToPatientDto(patientRepository.updatePatient(email, patient)
-                .orElseThrow(() -> new IllegalArgumentException("Password not updated.")));
+        Patient patientToUpdate = patientRepository.findPatientByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Patient Not Found."));
+        patientToUpdate.update(patient);
+        Patient updatedPatient = patientRepository.save(patientToUpdate);
+        return patientMapper.toDto(updatedPatient);
     }
 
-    public Patient updatePassword(String email, String password) {
-        return patientRepository.updatePassword(email, password)
-                .orElseThrow(() -> new IllegalArgumentException("Password not updated."));
+    @Transactional
+    public PatientDto updatePassword(String email, String password) {
+        Patient patientToUpdate = patientRepository.findPatientByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Patient Not Found."));
+        patientToUpdate.setPassword(password);
+        Patient updatedPatient = patientRepository.save(patientToUpdate);
+        return patientMapper.toDto(updatedPatient);
     }
 }

@@ -7,6 +7,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PatientMapper {
-    PatientDto patientToPatientDto(Patient patient);
-    List<PatientDto> mapListToDto(List<Patient> patients);
+    PatientDto toDto(Patient patient);
+    List<PatientDto> toDtos(List<Patient> patients);
 }
