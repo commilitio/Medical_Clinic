@@ -45,7 +45,7 @@ public class PatientController {
     }
 
     @PatchMapping("/{id}/visits/{visitId}")
-    public void assignPatientToVisit(@PathVariable Long id, @PathVariable Long visitId) {
-        patientService.assignPatientToVisit(id, visitId);
+    public PatientDto assignPatientToVisit(@PathVariable Long id, @PathVariable Long visitId) {
+        return patientService.assignPatientToVisit(id, visitId);
     }
 }

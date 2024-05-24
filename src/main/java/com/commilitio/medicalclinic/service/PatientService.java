@@ -67,15 +67,14 @@ public class PatientService {
     }
 
     @Transactional
-    public void assignPatientToVisit(Long id, Long visitId) {
+    public PatientDto assignPatientToVisit(Long id, Long visitId) {
         Patient patientToAssign = patientRepository.findPatientById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Patient Not Found."));
         Visit visit = visitRepository.findVisitById(visitId)
                 .orElseThrow(() -> new IllegalArgumentException("Visit Not Found."));
-        patientToAssign.getVisits().add(visit);
         visit.setPatient(patientToAssign);
 
         visitRepository.save(visit);
-        patientRepository.save(patientToAssign);
+        return patientMapper.toDto(patientToAssign);
     }
 }
