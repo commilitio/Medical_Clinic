@@ -3,11 +3,12 @@ package com.commilitio.medicalclinic.service;
 import com.commilitio.medicalclinic.mapper.PatientMapper;
 import com.commilitio.medicalclinic.model.Patient;
 import com.commilitio.medicalclinic.model.PatientDto;
+import com.commilitio.medicalclinic.model.Visit;
 import com.commilitio.medicalclinic.repository.PatientRepository;
+import com.commilitio.medicalclinic.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final VisitRepository visitRepository;
 
     public List<PatientDto> getPatients() {
         List<Patient> patients = patientRepository.findAll();
@@ -62,5 +64,17 @@ public class PatientService {
         patientToUpdate.setPassword(password);
         Patient updatedPatient = patientRepository.save(patientToUpdate);
         return patientMapper.toDto(updatedPatient);
+    }
+
+    @Transactional
+    public PatientDto assignPatientToVisit(Long id, Long visitId) {
+        Patient patientToAssign = patientRepository.findPatientById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Patient Not Found."));
+        Visit visit = visitRepository.findVisitById(visitId)
+                .orElseThrow(() -> new IllegalArgumentException("Visit Not Found."));
+        visit.setPatient(patientToAssign);
+
+        visitRepository.save(visit);
+        return patientMapper.toDto(patientToAssign);
     }
 }

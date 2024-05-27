@@ -43,4 +43,9 @@ public class PatientController {
     public PatientDto updatePassword(@PathVariable String email, @RequestBody String password) {
         return patientService.updatePassword(email, password);
     }
+
+    @PatchMapping("/{id}/visits/{visitId}")
+    public PatientDto assignPatientToVisit(@PathVariable Long id, @PathVariable Long visitId) {
+        return patientService.assignPatientToVisit(id, visitId);
+    }
 }

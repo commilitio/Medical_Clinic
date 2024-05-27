@@ -3,9 +3,12 @@ package com.commilitio.medicalclinic.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
+@Table(name = "PATIENT")
 public class Patient {
 
     @Id
@@ -25,6 +28,8 @@ public class Patient {
     private String phoneNumber;
     @Column(nullable = false, name = "BIRTHDATE")
     private LocalDate birthdate;
+    @OneToMany(mappedBy = "patient")
+    private Set<Visit> visits = new HashSet<>();
 
     public void update(Patient updatedPatient) {
         this.email = updatedPatient.getEmail();
