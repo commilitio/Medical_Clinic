@@ -35,8 +35,8 @@ public class DoctorController {
         doctorService.deleteDoctor(email);
     }
 
-    @PatchMapping("/{doctor_id}/facilities/{facility_id}")
-    public DoctorDto assignDoctorToFacility(@PathVariable Long doctor_id, @PathVariable Long facility_id) {
-        return doctorService.assignDoctorToFacility(doctor_id, facility_id);
+    @PatchMapping("/{doctorId}/facilities/{facilityId}")
+    public DoctorDto assignDoctorToFacility(@PathVariable Long doctorId, @PathVariable Long facilityId) {
+        return doctorService.assignDoctorToFacility(doctorId, facilityId);
     }
 }

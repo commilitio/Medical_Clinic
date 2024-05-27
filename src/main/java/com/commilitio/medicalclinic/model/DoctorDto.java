@@ -11,5 +11,5 @@ public class DoctorDto {
     private String firstName;
     private String lastName;
     private String specialization;
-    private Set<Facility> facilities;
+    private Set<Long> facilities;
 }

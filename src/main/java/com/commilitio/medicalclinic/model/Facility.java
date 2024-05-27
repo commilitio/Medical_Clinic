@@ -1,9 +1,16 @@
 package com.commilitio.medicalclinic.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "FACILITY")
 public class Facility {
@@ -19,7 +26,41 @@ public class Facility {
     private String zipCode;
     @Column(nullable = false, name = "STREET_NAME")
     private String streetName;
-    @Column(nullable = false, name = "FIRST_NUMBER")
+    @Column(nullable = false, name = "STREET_NUMBER")
     private String streetNumber;
+    @ManyToMany(mappedBy = "facilities")
+    private Set<Doctor> doctors = new HashSet<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Facility))
+            return false;
+
+        Facility other = (Facility) o;
+
+        return id != null &&
+                id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Facility{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", city='" + city + '\'' +
+                ", zipCode='" + zipCode + '\'' +
+                ", streetName='" + streetName + '\'' +
+                ", streetNumber='" + streetNumber + '\'' +
+                ", doctors=" + doctors.stream()
+                .map(Doctor::getId)
+                .collect(Collectors.toSet()) +
+                '}';
+    }
 }

@@ -1,11 +1,16 @@
 package com.commilitio.medicalclinic.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "DOCTOR")
 public class Doctor {
@@ -23,7 +28,6 @@ public class Doctor {
     private String lastName;
     @Column(nullable = false, name = "SPECIALIZATION")
     private String specialization;
-
     @ManyToMany
     @JoinTable(
             name = "DOCTOR_FACILITY",
@@ -32,4 +36,36 @@ public class Doctor {
     )
     private Set<Facility> facilities = new HashSet<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Doctor))
+            return false;
+
+        Doctor other = (Doctor) o;
+
+        return id != null &&
+                id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", specialization='" + specialization + '\'' +
+                ", facilities=" + facilities.stream()
+                .map(Facility::getId)
+                .collect(Collectors.toSet()) +
+                '}';
+    }
 }

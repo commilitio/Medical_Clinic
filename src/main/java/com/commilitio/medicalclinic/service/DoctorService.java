@@ -9,7 +9,6 @@ import com.commilitio.medicalclinic.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -50,10 +49,10 @@ public class DoctorService {
     }
 
     @Transactional
-    public DoctorDto assignDoctorToFacility(Long doctor_id, Long facility_id){
-        Doctor doctorToAssign = doctorRepository.findById(doctor_id)
+    public DoctorDto assignDoctorToFacility(Long doctorId, Long facilityId){
+        Doctor doctorToAssign = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new IllegalArgumentException("Doctor Not Found."));
-        Facility facility = facilityRepository.findById(facility_id)
+        Facility facility = facilityRepository.findById(facilityId)
                 .orElseThrow(() -> new IllegalArgumentException("Facility Not Found."));
 
         doctorToAssign.getFacilities().add(facility);
