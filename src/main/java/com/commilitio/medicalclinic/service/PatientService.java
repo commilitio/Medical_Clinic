@@ -7,6 +7,9 @@ import com.commilitio.medicalclinic.model.Visit;
 import com.commilitio.medicalclinic.repository.PatientRepository;
 import com.commilitio.medicalclinic.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -19,9 +22,10 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final VisitRepository visitRepository;
 
-    public List<PatientDto> getPatients() {
-        List<Patient> patients = patientRepository.findAll();
-        return patientMapper.toDtos(patients);
+    public List<PatientDto> getPatients(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Patient> patients = patientRepository.findAll(pageable);
+        return patientMapper.toDtos(patients.toList());
     }
 
     public PatientDto getPatient(String email) {

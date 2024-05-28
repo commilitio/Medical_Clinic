@@ -5,6 +5,9 @@ import com.commilitio.medicalclinic.model.Facility;
 import com.commilitio.medicalclinic.model.FacilityDto;
 import com.commilitio.medicalclinic.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +26,10 @@ public class FacilityService {
         return facilityMapper.toDto(facility);
     }
 
-    public List<FacilityDto> getFacilities() {
-        List<Facility> facilities = facilityRepository.findAll();
-        return facilityMapper.toDtos(facilities);
+    public List<FacilityDto> getFacilities(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Facility> facilities = facilityRepository.findAll(pageable);
+        return facilityMapper.toDtos(facilities.toList());
     }
 
     @Transactional

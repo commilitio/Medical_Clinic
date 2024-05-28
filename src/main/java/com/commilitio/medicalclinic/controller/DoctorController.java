@@ -21,8 +21,8 @@ public class DoctorController {
     }
 
     @GetMapping
-    public List<DoctorDto> getDoctors() {
-        return doctorService.getDoctors();
+    public List<DoctorDto> getDoctors(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+        return doctorService.getDoctors(page, size);
     }
 
     @PostMapping
