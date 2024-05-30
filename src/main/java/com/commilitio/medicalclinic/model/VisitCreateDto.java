@@ -4,11 +4,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class VisitDto {
+public class VisitCreateDto {
 
-    private Long id;
+    private Long doctorId;
     private LocalDateTime visitStartTime;
     private LocalDateTime visitEndTime;
-    private Long patientId;
-    private Long doctorId;
 }

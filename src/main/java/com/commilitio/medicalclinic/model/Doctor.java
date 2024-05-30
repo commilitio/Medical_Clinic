@@ -18,16 +18,14 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true, name = "EMAIL")
-    private String email;
-    @Column(nullable = false, name = "PASSWORD")
-    private String password;
-    @Column(nullable = false, name = "FIRST_NAME")
-    private String firstName;
-    @Column(nullable = false, name = "LAST_NAME")
-    private String lastName;
     @Column(nullable = false, name = "SPECIALIZATION")
     private String specialization;
+    @OneToMany(mappedBy = "doctor")
+    private Set<Visit> visits = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
     @ManyToMany
     @JoinTable(
             name = "DOCTOR_FACILITY",
@@ -58,14 +56,26 @@ public class Doctor {
     public String toString() {
         return "Doctor{" +
                 "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", user=" + user +
                 ", specialization='" + specialization + '\'' +
                 ", facilities=" + facilities.stream()
                 .map(Facility::getId)
                 .collect(Collectors.toSet()) +
                 '}';
     }
+
+    //    @Override
+//    public String toString() {
+//        return "Doctor{" +
+//                "id=" + id +
+//                ", email='" + user.getEmail() + '\'' +
+//                ", password='" + user.getPassword() + '\'' +
+//                ", firstName='" + user.getFirstName() + '\'' +
+//                ", lastName='" + user.getLastName() + '\'' +
+//                ", specialization='" + specialization + '\'' +
+//                ", facilities=" + facilities.stream()
+//                .map(Facility::getId)
+//                .collect(Collectors.toSet()) +
+//                '}';
+//    }
 }

@@ -14,8 +14,12 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface DoctorMapper {
 
+    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "firstName", source = "user.firstName")
+    @Mapping(target = "lastName", source = "user.lastName")
     @Mapping(target = "facilities", qualifiedByName = "mapToFacility")
     DoctorDto toDto(Doctor doctor);
+
     List<DoctorDto> toDtos(List<Doctor> doctors);
 
     @Named("mapToFacility")

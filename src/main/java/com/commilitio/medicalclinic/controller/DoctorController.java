@@ -15,9 +15,9 @@ public class DoctorController {
 
     private final DoctorService doctorService;
 
-    @GetMapping("/{email}")
-    public DoctorDto getDoctor(@PathVariable String email) {
-        return doctorService.getDoctor(email);
+    @GetMapping("/{id}")
+    public DoctorDto getDoctor(@PathVariable Long id) {
+        return doctorService.getDoctor(id);
     }
 
     @GetMapping
@@ -30,9 +30,9 @@ public class DoctorController {
         return doctorService.addDoctor(doctor);
     }
 
-    @DeleteMapping("/{email}")
-    public void deleteDoctor(@PathVariable String email) {
-        doctorService.deleteDoctor(email);
+    @DeleteMapping("/{id}")
+    public void deleteDoctor(@PathVariable Long id) {
+        doctorService.deleteDoctor(id);
     }
 
     @PatchMapping("/{doctorId}/facilities/{facilityId}")
