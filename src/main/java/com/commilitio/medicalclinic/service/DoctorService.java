@@ -34,6 +34,9 @@ public class DoctorService {
     public List<DoctorDto> getDoctors(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Doctor> doctors = doctorRepository.findAll(pageable);
+        if (doctors.isEmpty()) {
+            throw new IllegalArgumentException("No doctors found.");
+        }
         return doctorMapper.toDtos(doctors.toList());
     }
 

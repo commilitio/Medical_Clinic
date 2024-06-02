@@ -30,6 +30,9 @@ public class PatientService {
     public List<PatientDto> getPatients(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Patient> patients = patientRepository.findAll(pageable);
+        if (patients.isEmpty()) {
+            throw new IllegalArgumentException("No patients found.");
+        }
         return patientMapper.toDtos(patients.toList());
     }
 
