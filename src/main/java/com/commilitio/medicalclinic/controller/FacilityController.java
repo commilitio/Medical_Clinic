@@ -4,6 +4,7 @@ import com.commilitio.medicalclinic.model.Facility;
 import com.commilitio.medicalclinic.model.FacilityDto;
 import com.commilitio.medicalclinic.service.FacilityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class FacilityController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFacility(@PathVariable Long id) {
         facilityService.deleteFacility(id);
     }

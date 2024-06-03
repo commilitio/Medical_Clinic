@@ -3,6 +3,7 @@ package com.commilitio.medicalclinic.controller;
 import com.commilitio.medicalclinic.model.Patient;
 import com.commilitio.medicalclinic.model.PatientDto;
 import com.commilitio.medicalclinic.model.User;
+import com.commilitio.medicalclinic.model.VisitDto;
 import com.commilitio.medicalclinic.service.PatientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -13,13 +14,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import javax.print.attribute.standard.Media;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,7 +44,13 @@ public class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(patientDto.getEmail()));
+                .andExpect(jsonPath("$.id").value(patientDto.getId()))
+                .andExpect(jsonPath("$.email").value(patientDto.getEmail()))
+                .andExpect(jsonPath("$.idCardNo").value(patientDto.getIdCardNo()))
+                .andExpect(jsonPath("$.firstName").value(patientDto.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(patientDto.getLastName()))
+                .andExpect(jsonPath("$.phoneNumber").value(patientDto.getPhoneNumber()))
+                .andExpect(jsonPath("$.birthdate").value(patientDto.getBirthdate().toString()));
     }
 
     @Test
@@ -63,9 +67,18 @@ public class PatientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(result -> System.out.println("Response: " + result.getResponse().getContentAsString())) // Debugowanie odpowiedzi JSON
+                .andExpect(jsonPath("$[0].id").value(patientDto1.getId()))
                 .andExpect(jsonPath("$[0].email").value(patientDto1.getEmail()))
-                .andExpect(jsonPath("$[1].email").value(patientDto2.getEmail()));
+                .andExpect(jsonPath("$[0].firstName").value(patientDto1.getFirstName()))
+                .andExpect(jsonPath("$[0].lastName").value(patientDto1.getLastName()))
+                .andExpect(jsonPath("$[0].phoneNumber").value(patientDto1.getPhoneNumber()))
+                .andExpect(jsonPath("$[0].birthdate").value(patientDto1.getBirthdate().toString()))
+                .andExpect(jsonPath("$[1].id").value(patientDto2.getId()))
+                .andExpect(jsonPath("$[1].email").value(patientDto2.getEmail()))
+                .andExpect(jsonPath("$[1].firstName").value(patientDto2.getFirstName()))
+                .andExpect(jsonPath("$[1].lastName").value(patientDto2.getLastName()))
+                .andExpect(jsonPath("$[1].phoneNumber").value(patientDto2.getPhoneNumber()))
+                .andExpect(jsonPath("$[1].birthdate").value(patientDto2.getBirthdate().toString()));
     }
 
     @Test
@@ -89,7 +102,13 @@ public class PatientControllerTest {
                         .content(mapper.writeValueAsString(patient)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value(patient.getUser().getEmail()));
+                .andExpect(jsonPath("$.id").value(patient.getId()))
+                .andExpect(jsonPath("$.email").value(patient.getUser().getEmail()))
+                .andExpect(jsonPath("$.firstName").value(patient.getUser().getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(patient.getUser().getLastName()))
+                .andExpect(jsonPath("$.idCardNo").value(patient.getIdCardNo()))
+                .andExpect(jsonPath("$.phoneNumber").value(patient.getPhoneNumber()))
+                .andExpect(jsonPath("$.birthdate").value(patient.getBirthdate().toString()));
     }
 
     @Test
@@ -149,5 +168,23 @@ public class PatientControllerTest {
                         .content(newPass))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void assignPatientToVisit_CorrectData_ReturnUpdatedPatient() throws Exception {
+        // given
+        PatientDto patientDto = new PatientDto(1L, "bob@wp.pl", "23342", "Bob", "Kowalski", "500600700", LocalDate.of(1933, 11, 10));
+        VisitDto visitDto = new VisitDto(1L, LocalDateTime.of(2033, 11, 11, 15, 00), LocalDateTime.of(2033, 11, 11, 15, 15), 1L, 1L);
+        when(patientService.assignPatientToVisit(1L, 1L)).thenReturn(patientDto);
+        // when & then
+        mockMvc.perform(MockMvcRequestBuilders.patch("/patients/1/visits/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(patientDto.getEmail()))
+                .andExpect(jsonPath("$.firstName").value(patientDto.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(patientDto.getLastName()))
+                .andExpect(jsonPath("$.phoneNumber").value(patientDto.getPhoneNumber()))
+                .andExpect(jsonPath("$.birthdate").value(patientDto.getBirthdate().toString()));
     }
 }

@@ -56,8 +56,10 @@ public class DoctorServiceTest {
     void getDoctor_DoctorDoesNotExists_ThrowsIllegalArgumentException() {
         // given
         when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
-        // when & then
-        Assertions.assertThrows(IllegalArgumentException.class, () -> doctorService.getDoctor(1L));
+        // when
+        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> doctorService.getDoctor(1L));
+        // then
+        Assertions.assertEquals("Doctor Not Found.", result.getMessage());
     }
 
     @Test
@@ -74,8 +76,12 @@ public class DoctorServiceTest {
         // when
         var result = doctorService.getDoctors(pageNumber, pageSize);
         // then
-        Assertions.assertEquals(2, result.size());
         Assertions.assertNotNull(result);
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertEquals(1L, doctor1.getId());
+        Assertions.assertEquals(2L, doctor2.getId());
+        Assertions.assertEquals("Cardiology", doctor1.getSpecialization());
+        Assertions.assertEquals("Pulmonology", doctor2.getSpecialization());
     }
 
     @Test
