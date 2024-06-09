@@ -1,5 +1,7 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.DoctorException;
+import com.commilitio.medicalclinic.exception.VisitException;
 import com.commilitio.medicalclinic.mapper.VisitMapper;
 import com.commilitio.medicalclinic.model.Doctor;
 import com.commilitio.medicalclinic.model.Visit;
@@ -10,6 +12,7 @@ import com.commilitio.medicalclinic.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -25,8 +28,8 @@ public class VisitService {
     private final DoctorRepository doctorRepository;
 
     public List<VisitDto> getVisits(Pageable pageable) {
-        Page<Visit> patients = visitRepository.findAll(pageable);
-        return visitMapper.toDtos(patients.toList());
+        Page<Visit> visits = visitRepository.findAll(pageable);
+        return visitMapper.toDtos(visits.toList());
     }
 
     @Transactional
@@ -36,7 +39,7 @@ public class VisitService {
         validateVisitTime(visitCreateDto);
 
         Doctor doctor = doctorRepository.findById(visitCreateDto.getDoctorId())
-                .orElseThrow(() -> new IllegalArgumentException("Doctor Not Found."));
+                .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
 
         Visit createdVisit = new Visit();
         createdVisit.setVisitStartTime(visitCreateDto.getVisitStartTime());
@@ -53,19 +56,25 @@ public class VisitService {
                 visitCreateDto.getDoctorId(),
                 visitCreateDto.getVisitStartTime(),
                 visitCreateDto.getVisitEndTime()).isEmpty()) {
-            throw new IllegalArgumentException("The doctor's visits is already occupied at the specified time.");
+            throw new VisitException("The doctor's visits is already occupied at the specified time.", HttpStatus.CONFLICT);
         }
     }
 
-    private void validateVisitTime(VisitCreateDto visitCreateDto) {
+    protected void validateVisitTime(VisitCreateDto visitCreateDto) {
+        if (visitCreateDto.getVisitStartTime() == null || visitCreateDto.getVisitEndTime() == null) {
+            throw new VisitException("Visit start time and end time must not be null.", HttpStatus.BAD_REQUEST);
+        }
+        if (visitCreateDto.getVisitStartTime().isAfter(visitCreateDto.getVisitEndTime())) {
+            throw new VisitException("Visit start time must be before end time.", HttpStatus.BAD_REQUEST);
+        }
         if (visitCreateDto.getVisitStartTime().isBefore(LocalDateTime.now()) || visitCreateDto.getVisitEndTime().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Chosen visit has already expired.");
         }
     }
 
-    private void validateVisitMinutes(Visit visit) {
+    protected void validateVisitMinutes(Visit visit) {
         if (visit.getVisitStartTime().getMinute() % 15 != 0 || visit.getVisitEndTime().getMinute() % 15 != 0) {
-            throw new IllegalArgumentException("The visit times must be in 15 minute intervals.");
+            throw new VisitException("The visit times must be in 15 minute intervals.", HttpStatus.BAD_REQUEST);
         }
     }
 }

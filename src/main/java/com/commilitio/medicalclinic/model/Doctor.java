@@ -63,19 +63,4 @@ public class Doctor {
                 .collect(Collectors.toSet()) +
                 '}';
     }
-
-    //    @Override
-//    public String toString() {
-//        return "Doctor{" +
-//                "id=" + id +
-//                ", email='" + user.getEmail() + '\'' +
-//                ", password='" + user.getPassword() + '\'' +
-//                ", firstName='" + user.getFirstName() + '\'' +
-//                ", lastName='" + user.getLastName() + '\'' +
-//                ", specialization='" + specialization + '\'' +
-//                ", facilities=" + facilities.stream()
-//                .map(Facility::getId)
-//                .collect(Collectors.toSet()) +
-//                '}';
-//    }
 }

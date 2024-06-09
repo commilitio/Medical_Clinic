@@ -1,5 +1,6 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.VisitException;
 import com.commilitio.medicalclinic.mapper.VisitMapper;
 import com.commilitio.medicalclinic.model.Doctor;
 import com.commilitio.medicalclinic.model.Visit;
@@ -10,6 +11,9 @@ import com.commilitio.medicalclinic.repository.VisitRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
@@ -21,6 +25,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+
 import static org.mockito.Mockito.when;
 
 public class VisitServiceTest {
@@ -46,7 +52,6 @@ public class VisitServiceTest {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Visit> visitPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
         when(visitRepository.findAll(pageable)).thenReturn(visitPage);
-        when(visitMapper.toDtos(visitPage.toList())).thenReturn(Collections.emptyList());
         // when
         List<VisitDto> result = visitService.getVisits(pageable);
         // then
@@ -93,10 +98,6 @@ public class VisitServiceTest {
         visitDto2.setVisitStartTime(visit2.getVisitStartTime());
         visitDto2.setVisitEndTime(visit2.getVisitEndTime());
         visitDto2.setDoctorId(doctor2.getId());
-
-        List<VisitDto> visitDtos = List.of(visitDto1, visitDto2);
-
-        when(visitMapper.toDtos(visits)).thenReturn(visitDtos);
         // when
         List<VisitDto> result = visitService.getVisits(pageable);
         // then
@@ -121,36 +122,74 @@ public class VisitServiceTest {
 
         when(visitRepository.checkIfVisitsOverlap(doctorId, startTime, endTime)).thenReturn(overlappingVisits);
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> visitService.createVisit(visitCreateDto));
+        Exception result = Assertions.assertThrows(VisitException.class, () -> visitService.createVisit(visitCreateDto));
         // then
         Assertions.assertEquals("The doctor's visits is already occupied at the specified time.", result.getMessage());
     }
 
-    @Test
-    void createVisit_VisitHasExpired_ThrowsIllegalArgumentException() {
-        // given
-        VisitCreateDto visitCreateDto = new VisitCreateDto();
-        visitCreateDto.setVisitStartTime(LocalDateTime.now().minusHours(2));
-        visitCreateDto.setVisitEndTime(LocalDateTime.now().minusHours(1));
+    @ParameterizedTest
+    @MethodSource("provideWrongVisitTime")
+    void validateVisitTime_WrongVisitTime_ThrowsException(VisitCreateDto visitCreateDto, String expectedMessage, Class<RuntimeException> clazz) {
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> visitService.createVisit(visitCreateDto));
+        Exception result = Assertions.assertThrows(clazz, () -> visitService.validateVisitTime(visitCreateDto));
         // then
-        Assertions.assertEquals("Chosen visit has already expired.", result.getMessage());
+        Assertions.assertEquals(expectedMessage, result.getMessage());
+    }
+    private static Stream<Arguments> provideWrongVisitTime() {
+        return Stream.of(
+                Arguments.of(new VisitCreateDto(
+                                1L,
+                                LocalDateTime.of(2011, 11, 11, 14, 0),
+                                LocalDateTime.of(2026, 11, 11, 15, 0)),
+                        "Chosen visit has already expired.",
+                        IllegalArgumentException.class),
+                Arguments.of(new VisitCreateDto(
+                                1L,
+                                LocalDateTime.of(2031, 11, 11, 14, 0),
+                                LocalDateTime.of(2011, 11, 11, 15, 0)),
+                        "Visit start time must be before end time.",
+                        VisitException.class),
+                Arguments.of(new VisitCreateDto(
+                                1L,
+                                null,
+                                LocalDateTime.of(2026, 11, 11, 15, 0)),
+                        "Visit start time and end time must not be null.",
+                        VisitException.class),
+                Arguments.of(new VisitCreateDto(
+                                1L,
+                                LocalDateTime.of(2011, 11, 11, 14, 0),
+                                null),
+                        "Visit start time and end time must not be null.",
+                        VisitException.class)
+        );
     }
 
-    @Test
-    void createVisit_InvalidVisitMinutes_ThrowsIllegalArgumentException() {
-        // given
-        VisitCreateDto visitCreateDto = new VisitCreateDto();
-        visitCreateDto.setVisitStartTime(LocalDateTime.now().plusHours(1).withMinute(10));
-        visitCreateDto.setVisitEndTime(LocalDateTime.now().plusHours(2).withMinute(20));
-        Doctor doctor = new Doctor();
-        doctor.setId(1L);
-        when(doctorRepository.findById(visitCreateDto.getDoctorId())).thenReturn(Optional.of(doctor));
+    @ParameterizedTest
+    @MethodSource("provideWrongVisitMinutes")
+    void ValidateVisitMinutes_InvalidVisitMinutes_ThrowsException(Visit visit, String expectedMessage) {
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> visitService.createVisit(visitCreateDto));
+        Exception result = Assertions.assertThrows(VisitException.class, () -> visitService.validateVisitMinutes(visit));
         // then
-        Assertions.assertEquals("The visit times must be in 15 minute intervals.", result.getMessage());
+        Assertions.assertEquals(expectedMessage, result.getMessage());
+    }
+    private static Stream<Arguments> provideWrongVisitMinutes() {
+        return Stream.of(
+                Arguments.of(new Visit(
+                        1L,
+                        LocalDateTime.of(2027, 6, 5, 14, 7),
+                        LocalDateTime.of(2027, 6, 5, 15, 0),
+                        null, null), "The visit times must be in 15 minute intervals."),
+                Arguments.of(new Visit(
+                        2L,
+                        LocalDateTime.of(2027, 6, 5, 14, 0),
+                        LocalDateTime.of(2027, 6, 5, 15, 10),
+                        null, null), "The visit times must be in 15 minute intervals."),
+                Arguments.of(new Visit(
+                        3L,
+                        LocalDateTime.of(2027, 6, 5, 14, 5),
+                        LocalDateTime.of(2027, 6, 5, 15, 20),
+                        null, null), "The visit times must be in 15 minute intervals.")
+        );
     }
 
     @Test

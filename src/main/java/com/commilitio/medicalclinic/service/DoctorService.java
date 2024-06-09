@@ -1,5 +1,7 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.DoctorException;
+import com.commilitio.medicalclinic.exception.FacilityException;
 import com.commilitio.medicalclinic.mapper.DoctorMapper;
 import com.commilitio.medicalclinic.model.Doctor;
 import com.commilitio.medicalclinic.model.DoctorDto;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -27,7 +30,7 @@ public class DoctorService {
 
     public DoctorDto getDoctor(Long id) {
         Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor Not Found."));
+                .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
         return doctorMapper.toDto(doctor);
     }
 
@@ -35,7 +38,7 @@ public class DoctorService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Doctor> doctors = doctorRepository.findAll(pageable);
         if (doctors.isEmpty()) {
-            throw new IllegalArgumentException("No doctors found.");
+            throw new DoctorException("No doctors found.", HttpStatus.NOT_FOUND);
         }
         return doctorMapper.toDtos(doctors.toList());
     }
@@ -46,7 +49,7 @@ public class DoctorService {
                 .findPatientByEmail(doctor.getUser().getEmail())
                 .isPresent();
         if (doctorExists) {
-            throw new IllegalArgumentException("Doctor already exists.");
+            throw new DoctorException("Doctor already exists.", HttpStatus.CONFLICT);
         }
         User user = new User();
         user.setFirstName(doctor.getUser().getFirstName());
@@ -61,16 +64,16 @@ public class DoctorService {
 
     public void deleteDoctor(Long id) {
         Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor Not Found."));
+                .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
         doctorRepository.delete(doctor);
     }
 
     @Transactional
     public DoctorDto assignDoctorToFacility(Long doctorId, Long facilityId){
         Doctor doctorToAssign = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new IllegalArgumentException("Doctor Not Found."));
+                .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
         Facility facility = facilityRepository.findById(facilityId)
-                .orElseThrow(() -> new IllegalArgumentException("Facility Not Found."));
+                .orElseThrow(() -> new FacilityException("Facility Not Found.", HttpStatus.NOT_FOUND));
 
         doctorToAssign.getFacilities().add(facility);
         doctorRepository.save(doctorToAssign);

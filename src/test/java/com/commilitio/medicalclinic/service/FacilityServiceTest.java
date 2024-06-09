@@ -1,5 +1,6 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.FacilityException;
 import com.commilitio.medicalclinic.mapper.FacilityMapper;
 import com.commilitio.medicalclinic.model.Facility;
 import com.commilitio.medicalclinic.model.FacilityDto;
@@ -50,7 +51,7 @@ public class FacilityServiceTest {
         // given
         when(facilityRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> facilityService.getFacility(1L));
+        Exception result = Assertions.assertThrows(FacilityException.class, () -> facilityService.getFacility(1L));
         // then
         Assertions.assertEquals("Facility Not Found.", result.getMessage());
     }
@@ -78,7 +79,7 @@ public class FacilityServiceTest {
         Facility facility = new Facility(1L, "Hosp", "Waw", "12345", "st Xyz", "16", new HashSet<>());
         when(facilityRepository.findByName("Hosp")).thenReturn(Optional.of(facility));
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> facilityService.addFacility(facility));
+        Exception result = Assertions.assertThrows(FacilityException.class, () -> facilityService.addFacility(facility));
         // then
         Assertions.assertEquals("Facility already exists.", result.getMessage());
     }
@@ -106,7 +107,7 @@ public class FacilityServiceTest {
         // given
         when(facilityRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> facilityService.deleteFacility(1L));
+        Exception result = Assertions.assertThrows(FacilityException.class, () -> facilityService.deleteFacility(1L));
         // then
         Assertions.assertEquals("Facility Not Found.", result.getMessage());
     }

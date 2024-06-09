@@ -1,0 +1,97 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: commilitio
+      changes:
+        - createTable:
+            tableName: DOCTOR
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: SPECIALIZATION
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: USER_ID
+                  type: bigint
+                  constraints:
+                    nullable: true
+        - createTable:
+            tableName: FACILITY
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: NAME
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CITY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ZIP_CODE
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: STREET_NAME
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: STREET_NUMBER
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: DOCTOR_FACILITY
+            columns:
+              - column:
+                  name: DOCTOR_ID
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: FACILITY_ID
+                  type: bigint
+                  constraints:
+                    nullable: false
+            constraints:
+              primaryKey:
+                columnNames: DOCTOR_ID, FACILITY_ID
+
+        - addForeignKeyConstraint:
+            baseTableName: DOCTOR
+            baseColumnNames: USER_ID
+            referencedTableName: USERS
+            referencedColumnNames: id
+            constraintName: fk_doctor_user
+
+        - addForeignKeyConstraint:
+            baseTableName: DOCTOR_FACILITY
+            baseColumnNames: DOCTOR_ID
+            referencedTableName: DOCTOR
+            referencedColumnNames: id
+            constraintName: fk_doctor_facility_doctor
+
+        - addForeignKeyConstraint:
+            baseTableName: DOCTOR_FACILITY
+            baseColumnNames: FACILITY_ID
+            referencedTableName: FACILITY
+            referencedColumnNames: id
+            constraintName: fk_doctor_facility_facility

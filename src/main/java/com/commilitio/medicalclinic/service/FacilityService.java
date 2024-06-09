@@ -1,5 +1,6 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.FacilityException;
 import com.commilitio.medicalclinic.mapper.FacilityMapper;
 import com.commilitio.medicalclinic.model.Facility;
 import com.commilitio.medicalclinic.model.FacilityDto;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +24,7 @@ public class FacilityService {
 
     public FacilityDto getFacility(Long id) {
         Facility facility = facilityRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Facility Not Found."));
+                .orElseThrow(() -> new FacilityException("Facility Not Found.", HttpStatus.NOT_FOUND));
         return facilityMapper.toDto(facility);
     }
 
@@ -38,7 +40,7 @@ public class FacilityService {
                 .findByName(facility.getName())
                 .isPresent();
         if (facilityExists) {
-            throw new IllegalArgumentException("Facility already exists.");
+            throw new FacilityException("Facility already exists.", HttpStatus.CONFLICT);
         }
         Facility addedFacility = facilityRepository.save(facility);
         return facilityMapper.toDto(addedFacility);
@@ -46,7 +48,7 @@ public class FacilityService {
 
     public void deleteFacility(Long id) {
         Facility facility = facilityRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Facility Not Found."));
+                .orElseThrow(() -> new FacilityException("Facility Not Found.", HttpStatus.NOT_FOUND));
         facilityRepository.delete(facility);
     }
 }

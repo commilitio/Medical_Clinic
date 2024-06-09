@@ -1,5 +1,7 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.PatientException;
+import com.commilitio.medicalclinic.exception.VisitException;
 import com.commilitio.medicalclinic.mapper.PatientMapper;
 import com.commilitio.medicalclinic.model.*;
 import com.commilitio.medicalclinic.repository.PatientRepository;
@@ -55,7 +57,7 @@ public class PatientServiceTest {
         // given
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.getPatient(1L));
+        Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.getPatient(1L));
         // then
         Assertions.assertEquals("Patient Not Found.", result.getMessage());
     }
@@ -87,7 +89,7 @@ public class PatientServiceTest {
         Page<Patient> emptyPage = new PageImpl<>(Collections.emptyList());
         when(patientRepository.findAll(pageable)).thenReturn(emptyPage);
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.getPatients(pageNumber, pageSize));
+        Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.getPatients(pageNumber, pageSize));
         // then
         Assertions.assertEquals("No patients found.", result.getMessage());
     }
@@ -99,7 +101,7 @@ public class PatientServiceTest {
         Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
         when(userRepository.findPatientByEmail("jk@wp.pl")).thenReturn(Optional.of(user));
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.addPatient(patient));
+        Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.addPatient(patient));
         // then
         Assertions.assertEquals("Patient already exists.", result.getMessage());
     }
@@ -128,7 +130,7 @@ public class PatientServiceTest {
         // given
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.deletePatient(1L));
+        Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.deletePatient(1L));
         // then
         Assertions.assertEquals("Patient Not Found.", result.getMessage());
     }
@@ -150,7 +152,7 @@ public class PatientServiceTest {
         // given
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.updatePatient(1L, new Patient()));
+        Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.updatePatient(1L, new Patient()));
         // then
         Assertions.assertEquals("Patient Not Found.", result.getMessage());
     }
@@ -177,7 +179,7 @@ public class PatientServiceTest {
         // given
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.updatePassword(1L, "newPass"));
+        Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.updatePassword(1L, "newPass"));
         // then
         Assertions.assertEquals("Patient Not Found.", result.getMessage());
     }
@@ -204,13 +206,13 @@ public class PatientServiceTest {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         when(visitRepository.findVisitById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> patientService.assignPatientToVisit(1L, 1L));
+        Exception result = Assertions.assertThrows(VisitException.class, () -> patientService.assignPatientToVisit(1L, 1L));
         // then
         Assertions.assertEquals("Visit Not Found.", result.getMessage());
     }
 
     @Test
-    void assignPatientToVisit_VisitHasExpired__ThrowsIllegalArgumentException() {
+    void assignPatientToVisit_VisitHasExpired_ThrowsIllegalArgumentException() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
         Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);

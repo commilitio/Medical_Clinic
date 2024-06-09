@@ -1,5 +1,7 @@
 package com.commilitio.medicalclinic.service;
 
+import com.commilitio.medicalclinic.exception.DoctorException;
+import com.commilitio.medicalclinic.exception.FacilityException;
 import com.commilitio.medicalclinic.mapper.DoctorMapper;
 import com.commilitio.medicalclinic.model.*;
 import com.commilitio.medicalclinic.repository.DoctorRepository;
@@ -57,7 +59,7 @@ public class DoctorServiceTest {
         // given
         when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> doctorService.getDoctor(1L));
+        Exception result = Assertions.assertThrows(DoctorException.class, () -> doctorService.getDoctor(1L));
         // then
         Assertions.assertEquals("Doctor Not Found.", result.getMessage());
     }
@@ -91,7 +93,7 @@ public class DoctorServiceTest {
         Doctor doctor = new Doctor(1L, "Proctology", new HashSet<>(), user, new HashSet<>());
         when(userRepository.findPatientByEmail("bob@wp.pl")).thenReturn(Optional.of(user));
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> doctorService.addDoctor(doctor));
+        Exception result = Assertions.assertThrows(DoctorException.class, () -> doctorService.addDoctor(doctor));
         // then
         Assertions.assertEquals("Doctor already exists.", result.getMessage());
     }
@@ -115,7 +117,7 @@ public class DoctorServiceTest {
         // given
         when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> doctorService.deleteDoctor(1L));
+        Exception result = Assertions.assertThrows(DoctorException.class, () -> doctorService.deleteDoctor(1L));
         // then
         Assertions.assertEquals("Doctor Not Found.", result.getMessage());
     }
@@ -158,7 +160,7 @@ public class DoctorServiceTest {
         when(doctorRepository.findById(doctor.getId())).thenReturn(Optional.of(doctor));
         when(facilityRepository.findById(1L)).thenReturn(Optional.empty());
         // when
-        Exception result = Assertions.assertThrows(IllegalArgumentException.class, () -> doctorService.assignDoctorToFacility(1L, 1L));
+        Exception result = Assertions.assertThrows(FacilityException.class, () -> doctorService.assignDoctorToFacility(1L, 1L));
         // then
         Assertions.assertEquals("Facility Not Found.", result.getMessage());
     }
