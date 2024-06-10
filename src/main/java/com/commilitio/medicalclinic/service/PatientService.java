@@ -3,10 +3,8 @@ package com.commilitio.medicalclinic.service;
 import com.commilitio.medicalclinic.exception.PatientException;
 import com.commilitio.medicalclinic.exception.VisitException;
 import com.commilitio.medicalclinic.mapper.PatientMapper;
-import com.commilitio.medicalclinic.model.Patient;
-import com.commilitio.medicalclinic.model.PatientDto;
-import com.commilitio.medicalclinic.model.User;
-import com.commilitio.medicalclinic.model.Visit;
+import com.commilitio.medicalclinic.model.*;
+import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.PatientRepository;
 import com.commilitio.medicalclinic.repository.UserRepository;
 import com.commilitio.medicalclinic.repository.VisitRepository;
@@ -29,6 +27,7 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final VisitRepository visitRepository;
     private final UserRepository userRepository;
+    private final DoctorRepository doctorRepository;
 
     public List<PatientDto> getPatients(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -98,6 +97,12 @@ public class PatientService {
             throw new IllegalArgumentException("Chosen visit has already expired.");
         }
         visit.setPatient(patientToAssign);
+        patientToAssign.getDoctors().add(visit.getDoctor());
+        patientRepository.save(patientToAssign);
+
+        Doctor doctor = visit.getDoctor();
+        doctor.getPatients().add(patientToAssign);
+        doctorRepository.save(doctor);
 
         visitRepository.save(visit);
         return patientMapper.toDto(patientToAssign);

@@ -34,6 +34,14 @@ public class Doctor {
     )
     private Set<Facility> facilities = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "DOCTOR_PATIENT",
+            joinColumns = {@JoinColumn(name = "DOCTOR_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "PATIENT_ID")}
+    )
+    private Set<Patient> patients = new HashSet<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,6 +68,12 @@ public class Doctor {
                 ", specialization='" + specialization + '\'' +
                 ", facilities=" + facilities.stream()
                 .map(Facility::getId)
+                .collect(Collectors.toSet()) +
+                ", patients=" + patients.stream()
+                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
+                        patient.getId(),
+                        patient.getUser().getFirstName(),
+                        patient.getUser().getLastName()))
                 .collect(Collectors.toSet()) +
                 '}';
     }

@@ -29,7 +29,7 @@ public class DoctorServiceTest {
     private UserRepository userRepository;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         this.doctorRepository = Mockito.mock(DoctorRepository.class);
         this.facilityRepository = Mockito.mock(FacilityRepository.class);
         this.userRepository = Mockito.mock(UserRepository.class);
@@ -42,7 +42,7 @@ public class DoctorServiceTest {
     void getDoctor_DoctorExists_ReturnDoctor() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Cardiology", new HashSet<>(), user, new HashSet<>());
+        Doctor doctor = new Doctor(1L, "Cardiology", new HashSet<>(), user, new HashSet<>(), new HashSet<>());
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         // when
         DoctorDto result = doctorService.getDoctor(1L);
@@ -70,8 +70,8 @@ public class DoctorServiceTest {
         int pageNumber = 0;
         int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Doctor doctor1 = new Doctor(1L, "Cardiology", new HashSet<>(), new User(), new HashSet<>());
-        Doctor doctor2 = new Doctor(2L, "Pulmonology", new HashSet<>(), new User(), new HashSet<>());
+        Doctor doctor1 = new Doctor(1L, "Cardiology", new HashSet<>(), new User(), new HashSet<>(), new HashSet<>());
+        Doctor doctor2 = new Doctor(2L, "Pulmonology", new HashSet<>(), new User(), new HashSet<>(), new HashSet<>());
         List<Doctor> doctors = Arrays.asList(doctor1, doctor2);
         Page<Doctor> doctorPage = new PageImpl<>(doctors, pageable, doctors.size());
         when(doctorRepository.findAll(pageable)).thenReturn(doctorPage);
@@ -90,7 +90,7 @@ public class DoctorServiceTest {
     void addDoctor_DoctorAlreadyExists_ThrowsIllegalArgumentException() {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Proctology", new HashSet<>(), user, new HashSet<>());
+        Doctor doctor = new Doctor(1L, "Proctology", new HashSet<>(), user, new HashSet<>(), new HashSet<>());
         when(userRepository.findPatientByEmail("bob@wp.pl")).thenReturn(Optional.of(user));
         // when
         Exception result = Assertions.assertThrows(DoctorException.class, () -> doctorService.addDoctor(doctor));
@@ -102,7 +102,7 @@ public class DoctorServiceTest {
     void addDoctor_CorrectData_ReturnDoctor() {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>());
+        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>(), new HashSet<>());
         when(userRepository.findPatientByEmail("bob@wp.pl")).thenReturn(Optional.empty());
         when(doctorRepository.save(doctor)).thenReturn(doctor);
         // when
@@ -126,7 +126,7 @@ public class DoctorServiceTest {
     void deleteDoctor_DoctorExists_DoctorDeleted() {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>());
+        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>(), new HashSet<>());
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         // when
         doctorService.deleteDoctor(1L);
@@ -138,7 +138,7 @@ public class DoctorServiceTest {
     void assignDoctorToFacility_DoctorAndFacilityExist_ReturnAssignedDoctor() {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>());
+        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>(), new HashSet<>());
         Facility facility = new Facility(1L, "Hospital", "Waw", "009111", "ul Osa", "22", new HashSet<>());
         when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
         when(facilityRepository.findById(1L)).thenReturn(Optional.of(facility));
@@ -156,7 +156,7 @@ public class DoctorServiceTest {
     void assignDoctorToFacility_FacilityDoesNotExist_ThrowsIllegalArgumentException() {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>());
+        Doctor doctor = new Doctor(1L, "Surgery", new HashSet<>(), user, new HashSet<>(), new HashSet<>());
         when(doctorRepository.findById(doctor.getId())).thenReturn(Optional.of(doctor));
         when(facilityRepository.findById(1L)).thenReturn(Optional.empty());
         // when

@@ -20,13 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import static org.mockito.Mockito.when;
 
 public class VisitServiceTest {
@@ -135,6 +133,7 @@ public class VisitServiceTest {
         // then
         Assertions.assertEquals(expectedMessage, result.getMessage());
     }
+
     private static Stream<Arguments> provideWrongVisitTime() {
         return Stream.of(
                 Arguments.of(new VisitCreateDto(
@@ -172,6 +171,7 @@ public class VisitServiceTest {
         // then
         Assertions.assertEquals(expectedMessage, result.getMessage());
     }
+
     private static Stream<Arguments> provideWrongVisitMinutes() {
         return Stream.of(
                 Arguments.of(new Visit(

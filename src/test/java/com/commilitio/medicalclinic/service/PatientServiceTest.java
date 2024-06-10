@@ -4,6 +4,7 @@ import com.commilitio.medicalclinic.exception.PatientException;
 import com.commilitio.medicalclinic.exception.VisitException;
 import com.commilitio.medicalclinic.mapper.PatientMapper;
 import com.commilitio.medicalclinic.model.*;
+import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.PatientRepository;
 import com.commilitio.medicalclinic.repository.UserRepository;
 import com.commilitio.medicalclinic.repository.VisitRepository;
@@ -29,6 +30,7 @@ public class PatientServiceTest {
     private PatientMapper patientMapper;
     private VisitRepository visitRepository;
     private UserRepository userRepository;
+    private DoctorRepository doctorRepository;
 
     @BeforeEach
     void setUp() {
@@ -36,20 +38,21 @@ public class PatientServiceTest {
         this.visitRepository = Mockito.mock(VisitRepository.class);
         this.userRepository = Mockito.mock(UserRepository.class);
         this.patientMapper = Mappers.getMapper(PatientMapper.class);
+        this.doctorRepository = Mockito.mock(DoctorRepository.class);
 
-        this.patientService = new PatientService(patientRepository, patientMapper, visitRepository, userRepository);
+        this.patientService = new PatientService(patientRepository, patientMapper, visitRepository, userRepository, doctorRepository);
     }
 
     @Test
     void getPatient_PatientExist_ReturnPatient() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         // when
         PatientDto result = patientService.getPatient(1L);
         // then
-        Assertions.assertEquals(patientMapper.toDto(patient), result);      // moge tak ?
+        Assertions.assertEquals(patientMapper.toDto(patient), result);
     }
 
     @Test
@@ -68,9 +71,9 @@ public class PatientServiceTest {
         int pageSize = 10;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         User user1 = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient1 = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user1);
+        Patient patient1 = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user1, new HashSet<>());
         User user2 = new User(2L, "Bob", "Kowal", "bob@wp.pl", "pass2");
-        Patient patient2 = new Patient(2L, "234234", "100-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user2);
+        Patient patient2 = new Patient(2L, "234234", "100-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user2, new HashSet<>());
         List<Patient> patients = Arrays.asList(patient1, patient2);
         Page<Patient> doctorPage = new PageImpl<>(patients, pageable, patients.size());
         when(patientRepository.findAll(pageable)).thenReturn(doctorPage);
@@ -98,7 +101,7 @@ public class PatientServiceTest {
     void addPatient_PatientAlreadyExists_ThrowsIllegalArgumentException() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         when(userRepository.findPatientByEmail("jk@wp.pl")).thenReturn(Optional.of(user));
         // when
         Exception result = Assertions.assertThrows(PatientException.class, () -> patientService.addPatient(patient));
@@ -110,7 +113,7 @@ public class PatientServiceTest {
     void addPatient_CorrectData_ReturnPatient() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         when(userRepository.findPatientByEmail("jk@wp.pl")).thenReturn(Optional.empty());
         when(patientRepository.save(patient)).thenReturn(patient);
         // when
@@ -139,7 +142,7 @@ public class PatientServiceTest {
     void deletePatient_CorrectData_PatientDeleted() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         // when
         patientService.deletePatient(1L);
@@ -161,9 +164,9 @@ public class PatientServiceTest {
     void updatePatient_CorrectData_ReturnUpdatedPatient() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         User newUser = new User(1L, "Bob", "Kowal", "bob@wp.pl", "pass1");
-        Patient newPatient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), newUser);
+        Patient newPatient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), newUser, new HashSet<>());
 
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         when(patientRepository.save(patient)).thenReturn(patient);
@@ -188,7 +191,7 @@ public class PatientServiceTest {
     void updatePassword_CorrectData_ReturnPatient() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         when(patientRepository.save(patient)).thenReturn(patient);
         // when
@@ -202,7 +205,7 @@ public class PatientServiceTest {
     void assignPatientToVisit_VisitDoNotExist_ThrowsIllegalArgumentException() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         when(visitRepository.findVisitById(1L)).thenReturn(Optional.empty());
         // when
@@ -215,7 +218,7 @@ public class PatientServiceTest {
     void assignPatientToVisit_VisitHasExpired_ThrowsIllegalArgumentException() {
         // given
         User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user, new HashSet<>());
         Doctor doctor = new Doctor();
         LocalDateTime visitStartTime = LocalDateTime.of(2011, 11,10, 18, 15);
         LocalDateTime visitEndTime = LocalDateTime.of(2011, 11,10, 18, 30);
@@ -231,12 +234,16 @@ public class PatientServiceTest {
     @Test
     void assignPatientToVisit_CorrectData_ReturnPatient() {
         // given
-        User user = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
-        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), user);
-        Doctor doctor = new Doctor();
+        User patientUser = new User(1L, "Jan", "Kowal", "jk@wp.pl", "pass1");
+        Patient patient = new Patient(1L, "141324", "300-400-500", LocalDate.of(2001, 11, 13), new HashSet<>(), patientUser, new HashSet<>());
+
+        User doctorUser = new User(2L, "Adam", "Nowak", "an@wp.pl", "pass2");
+        Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), doctorUser, new HashSet<>(), new HashSet<>());
+
         LocalDateTime visitStartTime = LocalDateTime.of(2026, 11,10, 18, 15);
         LocalDateTime visitEndTime = LocalDateTime.of(2026, 11,10, 18, 30);
         Visit visit = new Visit(1L, visitStartTime, visitEndTime, null, doctor);
+
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
         when(visitRepository.findVisitById(1L)).thenReturn(Optional.of(visit));
         // when

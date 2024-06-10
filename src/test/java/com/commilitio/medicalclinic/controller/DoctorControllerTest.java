@@ -1,9 +1,6 @@
 package com.commilitio.medicalclinic.controller;
 
-import com.commilitio.medicalclinic.model.Doctor;
-import com.commilitio.medicalclinic.model.DoctorDto;
-import com.commilitio.medicalclinic.model.Facility;
-import com.commilitio.medicalclinic.model.User;
+import com.commilitio.medicalclinic.model.*;
 import com.commilitio.medicalclinic.service.DoctorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -17,6 +14,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,7 +35,7 @@ public class DoctorControllerTest {
     @Test
     void getDoctor_CorrectData_ReturnDoctor() throws Exception {
         // given
-        DoctorDto doctorDto = new DoctorDto(1L, "bob@wp.pl", "Bob", "Pop", "Cardiologist", new HashSet<>());
+        DoctorDto doctorDto = new DoctorDto(1L, "bob@wp.pl", "Bob", "Pop", "Cardiologist", new HashSet<>(), new HashSet<>());
         when(doctorService.getDoctor(1L)).thenReturn(doctorDto);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.get("/doctors/1")
@@ -52,8 +51,8 @@ public class DoctorControllerTest {
     @Test
     void getDoctors_CorrectData_ReturnDoctors() throws Exception {
         // given
-        DoctorDto doctorDto1 = new DoctorDto(1L, "bob@wp.pl", "Bob", "Pop", "Cardiologist", new HashSet<>());
-        DoctorDto doctorDto2 = new DoctorDto(2L, "jan@wp.pl", "Jan", "Pop", "Cardiologist", new HashSet<>());
+        DoctorDto doctorDto1 = new DoctorDto(1L, "bob@wp.pl", "Bob", "Pop", "Cardiologist", new HashSet<>(), new HashSet<>());
+        DoctorDto doctorDto2 = new DoctorDto(2L, "jan@wp.pl", "Jan", "Pop", "Cardiologist", new HashSet<>(), new HashSet<>());
         List<DoctorDto> doctors = List.of(doctorDto1, doctorDto2);
         when(doctorService.getDoctors(0, 10)).thenReturn(doctors);
         // when & then
@@ -71,21 +70,31 @@ public class DoctorControllerTest {
     void addDoctor_CorrectData_ReturnDoctor() throws Exception {
         // given
         User user = new User(1L, "Bob", "Pop", "bob@wp.pl", "pass123");
-        Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), user, new HashSet<>());
+        Set<Patient> patients = new HashSet<>();
+        Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), user, new HashSet<>(), patients);
+
+        Set<String> patientStrings = patients.stream()
+                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
+                        patient.getId(),
+                        patient.getUser().getFirstName(),
+                        patient.getUser().getLastName()))
+                .collect(Collectors.toSet());
+
         DoctorDto doctorDto = new DoctorDto(
                 doctor.getId(),
                 doctor.getUser().getEmail(),
                 doctor.getUser().getFirstName(),
                 doctor.getUser().getLastName(),
                 doctor.getSpecialization(),
-                new HashSet<>());
+                new HashSet<>(),
+                patientStrings);
         when(doctorService.addDoctor(doctor)).thenReturn(doctorDto);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/doctors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(doctor)))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(doctorDto.getEmail()))
                 .andExpect(jsonPath("$.firstName").value(doctorDto.getFirstName()))
                 .andExpect(jsonPath("$.lastName").value(doctorDto.getLastName()))
@@ -108,14 +117,24 @@ public class DoctorControllerTest {
         Facility facility = new Facility(1L, "Hosp1", "Waw", "00-300", "Lecznicza", "11", new HashSet<>());
         Set<Facility> facilities = Set.of(facility);
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
-        Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), user, facilities);
+        Set<Patient> patients = new HashSet<>();
+        Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), user, facilities, patients);
+
+        Set<String> patientStrings = patients.stream()
+                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
+                        patient.getId(),
+                        patient.getUser().getFirstName(),
+                        patient.getUser().getLastName()))
+                .collect(Collectors.toSet());
+
         DoctorDto doctorDto = new DoctorDto(
                 doctor.getId(),
                 doctor.getUser().getEmail(),
                 doctor.getUser().getFirstName(),
                 doctor.getUser().getLastName(),
                 doctor.getSpecialization(),
-                Set.of(1L));
+                Set.of(1L),
+                patientStrings);
         when(doctorService.assignDoctorToFacility(1L, 1L)).thenReturn(doctorDto);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.patch("/doctors/1/facilities/1")
