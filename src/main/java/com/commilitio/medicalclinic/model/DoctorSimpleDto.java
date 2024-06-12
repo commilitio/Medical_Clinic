@@ -2,17 +2,13 @@ package com.commilitio.medicalclinic.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
-public class DoctorDto {
+public class DoctorSimpleDto {
 
     private Long id;
-    private String email;
     private String firstName;
     private String lastName;
     private String specialization;
-    private Set<Long> facilities;
-    private Set<PatientSimpleDto> patients;
 }

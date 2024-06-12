@@ -84,14 +84,12 @@ public class PatientControllerTest {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
         Set<Doctor> doctors = new HashSet<>();
+        Doctor doctor = new Doctor(1L, "Pediatrics", new HashSet<>(), new User(), new HashSet<>(), new HashSet<>());
+        doctors.add(doctor);
         Patient patient = new Patient(1L, "23342", "500600700", LocalDate.of(1922, 11, 11), new HashSet<>(), user, doctors);
 
-        Set<String> doctorStrings = doctors.stream()
-                .map(doctor -> String.format("Doctor{id=%d, firstName='%s', lastName='%s', specialization='%s'}",
-                        doctor.getId(),
-                        doctor.getUser().getFirstName(),
-                        doctor.getUser().getLastName(),
-                        doctor.getSpecialization()))
+        Set<DoctorSimpleDto> doctorSimpleDtos = doctors.stream()
+                .map(doctor1 -> new DoctorSimpleDto(doctor1.getId(), doctor1.getUser().getFirstName(), doctor1.getUser().getLastName(), doctor1.getSpecialization()))
                 .collect(Collectors.toSet());
 
         PatientDto patientDto = new PatientDto(
@@ -102,7 +100,7 @@ public class PatientControllerTest {
                 patient.getUser().getLastName(),
                 patient.getPhoneNumber(),
                 patient.getBirthdate(),
-                doctorStrings
+                doctorSimpleDtos
         );
         when(patientService.addPatient(patient)).thenReturn(patientDto);
         //when & then
@@ -135,14 +133,12 @@ public class PatientControllerTest {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
         Set<Doctor> doctors = new HashSet<>();
+        Doctor doctor = new Doctor(1L, "Pediatrics", new HashSet<>(), new User(), new HashSet<>(), new HashSet<>());
+        doctors.add(doctor);
         Patient patient = new Patient(1L, "23342", "500600700", LocalDate.of(1922, 11, 11), new HashSet<>(), user, doctors);
 
-        Set<String> doctorStrings = doctors.stream()
-                .map(doctor -> String.format("Doctor{id=%d, firstName='%s', lastName='%s', specialization='%s'}",
-                        doctor.getId(),
-                        doctor.getUser().getFirstName(),
-                        doctor.getUser().getLastName(),
-                        doctor.getSpecialization()))
+        Set<DoctorSimpleDto> doctorSimpleDtos = doctors.stream()
+                .map(doctor1 -> new DoctorSimpleDto(doctor1.getId(), doctor1.getUser().getFirstName(), doctor1.getUser().getLastName(), doctor1.getSpecialization()))
                 .collect(Collectors.toSet());
 
         PatientDto updatedPatient = new PatientDto(
@@ -153,7 +149,7 @@ public class PatientControllerTest {
                 patient.getUser().getLastName(),
                 patient.getPhoneNumber(),
                 patient.getBirthdate(),
-                doctorStrings
+                doctorSimpleDtos
         );
         when(patientService.updatePatient(1L, patient)).thenReturn(updatedPatient);
         // when & then
@@ -170,14 +166,16 @@ public class PatientControllerTest {
         // given
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
         Set<Doctor> doctors = new HashSet<>();
+        Doctor doctor = new Doctor(1L, "Pediatrics", new HashSet<>(), new User(), new HashSet<>(), new HashSet<>());
+        doctors.add(doctor);
         Patient patient = new Patient(1L, "23342", "500600700", LocalDate.of(1922, 11, 11), new HashSet<>(), user, doctors);
 
-        Set<String> doctorStrings = doctors.stream()
-                .map(doctor -> String.format("Doctor{id=%d, firstName='%s', lastName='%s', specialization='%s'}",
-                        doctor.getId(),
-                        doctor.getUser().getFirstName(),
-                        doctor.getUser().getLastName(),
-                        doctor.getSpecialization()))
+        Set<DoctorSimpleDto> doctorSimpleDtos = doctors.stream()
+                .map(doctor1 -> new DoctorSimpleDto(
+                        doctor1.getId(),
+                        doctor1.getUser().getFirstName(),
+                        doctor1.getUser().getLastName(),
+                        doctor1.getSpecialization()))
                 .collect(Collectors.toSet());
 
         PatientDto updatedPatient = new PatientDto(
@@ -188,7 +186,7 @@ public class PatientControllerTest {
                 patient.getUser().getLastName(),
                 patient.getPhoneNumber(),
                 patient.getBirthdate(),
-                doctorStrings
+                doctorSimpleDtos
         );
         String newPass = "testyJednostkowe";
         when(patientService.updatePassword(1L, newPass)).thenReturn(updatedPatient);

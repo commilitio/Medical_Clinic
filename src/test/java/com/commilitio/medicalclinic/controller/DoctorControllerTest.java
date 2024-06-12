@@ -11,6 +11,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -70,14 +72,17 @@ public class DoctorControllerTest {
     void addDoctor_CorrectData_ReturnDoctor() throws Exception {
         // given
         User user = new User(1L, "Bob", "Pop", "bob@wp.pl", "pass123");
+        Patient patient = new Patient(1L, "23342", "500600700", LocalDate.of(1980, 1, 1), new HashSet<>(), user, new HashSet<>());
         Set<Patient> patients = new HashSet<>();
+        patients.add(patient);
+
         Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), user, new HashSet<>(), patients);
 
-        Set<String> patientStrings = patients.stream()
-                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
-                        patient.getId(),
-                        patient.getUser().getFirstName(),
-                        patient.getUser().getLastName()))
+        Set<PatientSimpleDto> patientSimpleDtos = patients.stream()
+                .map(p -> new PatientSimpleDto(
+                        p.getId(),
+                        p.getUser().getFirstName(),
+                        p.getUser().getLastName()))
                 .collect(Collectors.toSet());
 
         DoctorDto doctorDto = new DoctorDto(
@@ -87,7 +92,8 @@ public class DoctorControllerTest {
                 doctor.getUser().getLastName(),
                 doctor.getSpecialization(),
                 new HashSet<>(),
-                patientStrings);
+                patientSimpleDtos
+        );
         when(doctorService.addDoctor(doctor)).thenReturn(doctorDto);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/doctors")
@@ -117,14 +123,16 @@ public class DoctorControllerTest {
         Facility facility = new Facility(1L, "Hosp1", "Waw", "00-300", "Lecznicza", "11", new HashSet<>());
         Set<Facility> facilities = Set.of(facility);
         User user = new User(1L, "Bob", "Budowniczy", "bob@wp.pl", "pass1");
+        Patient patient = new Patient(1L, "23342", "500600700", LocalDate.of(1980, 1, 1), new HashSet<>(), user, new HashSet<>());
         Set<Patient> patients = new HashSet<>();
+        patients.add(patient);
         Doctor doctor = new Doctor(1L, "Cardiologist", new HashSet<>(), user, facilities, patients);
 
-        Set<String> patientStrings = patients.stream()
-                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
-                        patient.getId(),
-                        patient.getUser().getFirstName(),
-                        patient.getUser().getLastName()))
+        Set<PatientSimpleDto> patientSimpleDtos = patients.stream()
+                .map(p -> new PatientSimpleDto(
+                        p.getId(),
+                        p.getUser().getFirstName(),
+                        p.getUser().getLastName()))
                 .collect(Collectors.toSet());
 
         DoctorDto doctorDto = new DoctorDto(
@@ -134,7 +142,8 @@ public class DoctorControllerTest {
                 doctor.getUser().getLastName(),
                 doctor.getSpecialization(),
                 Set.of(1L),
-                patientStrings);
+                patientSimpleDtos
+        );
         when(doctorService.assignDoctorToFacility(1L, 1L)).thenReturn(doctorDto);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.patch("/doctors/1/facilities/1")

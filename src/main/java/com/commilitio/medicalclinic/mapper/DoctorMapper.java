@@ -1,9 +1,6 @@
 package com.commilitio.medicalclinic.mapper;
 
-import com.commilitio.medicalclinic.model.Doctor;
-import com.commilitio.medicalclinic.model.DoctorDto;
-import com.commilitio.medicalclinic.model.Facility;
-import com.commilitio.medicalclinic.model.Patient;
+import com.commilitio.medicalclinic.model.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -35,12 +32,12 @@ public interface DoctorMapper {
     }
 
     @Named("mapPatients")
-    default Set<String> mapPatients(Set<Patient> patients) {
+    default Set<PatientSimpleDto> mapPatients(Set<Patient> patients) {
         if (patients == null) {
             return new HashSet<>();
         }
         return patients.stream()
-                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
+                .map(patient -> new PatientSimpleDto(
                         patient.getId(),
                         patient.getUser().getFirstName(),
                         patient.getUser().getLastName()))
