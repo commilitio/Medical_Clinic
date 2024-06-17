@@ -18,16 +18,14 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true, name = "EMAIL")
-    private String email;
-    @Column(nullable = false, name = "PASSWORD")
-    private String password;
-    @Column(nullable = false, name = "FIRST_NAME")
-    private String firstName;
-    @Column(nullable = false, name = "LAST_NAME")
-    private String lastName;
     @Column(nullable = false, name = "SPECIALIZATION")
     private String specialization;
+    @OneToMany(mappedBy = "doctor")
+    private Set<Visit> visits = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
     @ManyToMany
     @JoinTable(
             name = "DOCTOR_FACILITY",
@@ -35,6 +33,14 @@ public class Doctor {
             inverseJoinColumns = {@JoinColumn(name = "FACILITY_ID")}
     )
     private Set<Facility> facilities = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "DOCTOR_PATIENT",
+            joinColumns = {@JoinColumn(name = "DOCTOR_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "PATIENT_ID")}
+    )
+    private Set<Patient> patients = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -58,13 +64,16 @@ public class Doctor {
     public String toString() {
         return "Doctor{" +
                 "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
+                ", user=" + user +
                 ", specialization='" + specialization + '\'' +
                 ", facilities=" + facilities.stream()
                 .map(Facility::getId)
+                .collect(Collectors.toSet()) +
+                ", patients=" + patients.stream()
+                .map(patient -> String.format("Patient{id=%d, firstName='%s', lastName='%s'}",
+                        patient.getId(),
+                        patient.getUser().getFirstName(),
+                        patient.getUser().getLastName()))
                 .collect(Collectors.toSet()) +
                 '}';
     }

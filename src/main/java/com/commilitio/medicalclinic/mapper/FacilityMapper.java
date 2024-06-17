@@ -18,7 +18,6 @@ public interface FacilityMapper {
     @Mapping(target = "doctors", qualifiedByName = "mapToDoctor")
     FacilityDto toDto(Facility facility);
 
-    @Mapping(target = "doctors", qualifiedByName = "mapToDoctor")
     List<FacilityDto> toDtos(List<Facility> facilities);
 
     @Named("mapToDoctor")

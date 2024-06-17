@@ -1,0 +1,74 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: commilitio
+      changes:
+        - createTable:
+            tableName: PATIENT
+            columns:
+              - column:
+                  name: ID
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_patient_id
+              - column:
+                  name: ID_CARD_NO
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: unique_patient_id_card_no
+              - column:
+                  name: PHONE_NUMBER
+                  type: varchar(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: BIRTHDATE
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: USER_ID
+                  type: bigint
+
+        - createTable:
+            tableName: USERS
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: FIRST_NAME
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: LAST_NAME
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: EMAIL
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: PASSWORD
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - addForeignKeyConstraint:
+                  baseTableName: PATIENT
+                  baseColumnNames: USER_ID
+                  referencedTableName: USERS
+                  referencedColumnNames: id

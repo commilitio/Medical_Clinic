@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class VisitDto {
+@NoArgsConstructor
+public class VisitCreateDto {
 
-    private Long id;
+    private Long doctorId;
     private LocalDateTime visitStartTime;
     private LocalDateTime visitEndTime;
-    private Long patientId;
-    private Long doctorId;
 }

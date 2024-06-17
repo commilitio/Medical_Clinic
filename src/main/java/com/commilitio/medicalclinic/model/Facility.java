@@ -1,8 +1,8 @@
 package com.commilitio.medicalclinic.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +18,7 @@ public class Facility {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Size(min = 3, max = 40)
     @Column(nullable = false, name = "NAME", unique = true)
     private String name;
     @Column(nullable = false, name = "CITY")
