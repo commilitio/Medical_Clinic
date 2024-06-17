@@ -66,7 +66,7 @@ public class VisitControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(visitCreateDto)))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(visitDto.getId()))
                 .andExpect(jsonPath("$.doctorId").value(visitDto.getDoctorId()))
                 .andExpect(jsonPath("$.patientId").value(visitDto.getPatientId()));

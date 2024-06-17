@@ -86,7 +86,7 @@ public class FacilityControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(facility)))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(facility.getName()))
                 .andExpect(jsonPath("$.city").value(facility.getCity()))
                 .andExpect(jsonPath("$.zipCode").value(facility.getZipCode()))
