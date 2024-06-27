@@ -3,6 +3,7 @@ package com.commilitio.medicalclinic.service;
 import com.commilitio.medicalclinic.exception.PatientException;
 import com.commilitio.medicalclinic.exception.VisitException;
 import com.commilitio.medicalclinic.mapper.PatientMapper;
+import com.commilitio.medicalclinic.mapper.VisitMapper;
 import com.commilitio.medicalclinic.model.*;
 import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.PatientRepository;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
@@ -28,6 +31,7 @@ public class PatientService {
     private final VisitRepository visitRepository;
     private final UserRepository userRepository;
     private final DoctorRepository doctorRepository;
+    private final VisitMapper visitMapper;
 
     public List<PatientDto> getPatients(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -42,6 +46,13 @@ public class PatientService {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientException("Patient Not Found.", HttpStatus.NOT_FOUND));
         return patientMapper.toDto(patient);
+    }
+
+    public List<VisitDto> getPatientVisits(Long id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientException("Patient Not Found.", HttpStatus.NOT_FOUND));
+        List<Visit> visits = new ArrayList<>(patient.getVisits());
+        return visitMapper.toDtos(visits);
     }
 
     @Transactional
@@ -98,6 +109,7 @@ public class PatientService {
         }
         visit.setPatient(patientToAssign);
         patientToAssign.getDoctors().add(visit.getDoctor());
+        patientToAssign.getVisits().add(visit);
         patientRepository.save(patientToAssign);
 
         Doctor doctor = visit.getDoctor();

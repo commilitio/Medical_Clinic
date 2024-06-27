@@ -3,6 +3,7 @@ package com.commilitio.medicalclinic.service;
 import com.commilitio.medicalclinic.exception.DoctorException;
 import com.commilitio.medicalclinic.exception.FacilityException;
 import com.commilitio.medicalclinic.mapper.DoctorMapper;
+import com.commilitio.medicalclinic.mapper.VisitMapper;
 import com.commilitio.medicalclinic.model.*;
 import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.FacilityRepository;
@@ -27,6 +28,7 @@ public class DoctorServiceTest {
     private FacilityRepository facilityRepository;
     private DoctorMapper doctorMapper;
     private UserRepository userRepository;
+    private VisitMapper visitMapper;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +37,7 @@ public class DoctorServiceTest {
         this.userRepository = Mockito.mock(UserRepository.class);
         this.doctorMapper = Mappers.getMapper(DoctorMapper.class);
 
-        this.doctorService = new DoctorService(doctorRepository, facilityRepository, doctorMapper, userRepository);
+        this.doctorService = new DoctorService(doctorRepository, facilityRepository, doctorMapper, userRepository, visitMapper);
     }
 
     @Test

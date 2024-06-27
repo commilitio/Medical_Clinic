@@ -2,6 +2,7 @@ package com.commilitio.medicalclinic.controller;
 
 import com.commilitio.medicalclinic.model.Patient;
 import com.commilitio.medicalclinic.model.PatientDto;
+import com.commilitio.medicalclinic.model.VisitDto;
 import com.commilitio.medicalclinic.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,6 +44,18 @@ public class PatientController {
     @GetMapping("/{id}")
     public PatientDto getPatient(@Parameter(description = "id of patient to be searched") @PathVariable Long id) {
         return patientService.getPatient(id);
+    }
+
+    @Operation(summary = "Get patient visits list by his id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found patients list",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PatientDto.class)) }),
+            @ApiResponse(responseCode = "404", description = "Patient Not Found",
+                    content = @Content)})
+    @GetMapping("/{id}/visits")
+    public List<VisitDto> getPatientVisits(@Parameter(description = "id of patient to be searched") @PathVariable Long id) {
+        return patientService.getPatientVisits(id);
     }
 
     @Operation(summary = "Add a new patient")
