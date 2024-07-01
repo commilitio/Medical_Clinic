@@ -15,8 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -30,6 +33,13 @@ public class VisitService {
     public List<VisitDto> getVisits(Pageable pageable) {
         Page<Visit> visits = visitRepository.findAll(pageable);
         return visitMapper.toDtos(visits.toList());
+    }
+
+    public List<VisitDto> getVisitsBySpecialization(LocalDate visitDate, String specialization){
+        List<Visit> visits = visitRepository.getVisitsBySpecialization(visitDate, specialization);
+        return visits.stream()
+                .map(visitMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional

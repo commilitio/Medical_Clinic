@@ -3,10 +3,8 @@ package com.commilitio.medicalclinic.service;
 import com.commilitio.medicalclinic.exception.DoctorException;
 import com.commilitio.medicalclinic.exception.FacilityException;
 import com.commilitio.medicalclinic.mapper.DoctorMapper;
-import com.commilitio.medicalclinic.model.Doctor;
-import com.commilitio.medicalclinic.model.DoctorDto;
-import com.commilitio.medicalclinic.model.Facility;
-import com.commilitio.medicalclinic.model.User;
+import com.commilitio.medicalclinic.mapper.VisitMapper;
+import com.commilitio.medicalclinic.model.*;
 import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.FacilityRepository;
 import com.commilitio.medicalclinic.repository.UserRepository;
@@ -27,6 +25,7 @@ public class DoctorService {
     private final FacilityRepository facilityRepository;
     private final DoctorMapper doctorMapper;
     private final UserRepository userRepository;
+    private final VisitMapper visitMapper;
 
     public DoctorDto getDoctor(Long id) {
         Doctor doctor = doctorRepository.findById(id)
@@ -41,6 +40,16 @@ public class DoctorService {
             throw new DoctorException("No doctors found.", HttpStatus.NOT_FOUND);
         }
         return doctorMapper.toDtos(doctors.toList());
+    }
+
+    public List<VisitDto> getDoctorAvailableVisits(Long id) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
+
+        return doctor.getVisits().stream()
+                .filter(visit -> visit.getPatient() == null)
+                .map(visitMapper::toDto)
+                .toList();
     }
 
     @Transactional

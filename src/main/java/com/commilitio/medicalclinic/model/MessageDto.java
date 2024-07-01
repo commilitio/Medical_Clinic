@@ -1,14 +1,15 @@
 package com.commilitio.medicalclinic.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class MessageDto {
-    private String message;
-    private LocalDate date;
-    private HttpStatus httpStatus;
+    private final String message;
+    private final LocalDate date;
+    private final HttpStatus httpStatus;
 }

@@ -1,13 +1,16 @@
 package com.commilitio.medicalclinic.model;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class FacilitySimpleDto {
-    private Long id;
-    private String name;
-    private String city;
-    private String zipCode;
-    private String streetName;
-    private String streetNumber;
+    private final Long id;
+    private final String name;
+    private final String city;
+    private final String zipCode;
+    private final String streetName;
+    private final String streetNumber;
 }

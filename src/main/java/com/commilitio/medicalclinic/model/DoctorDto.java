@@ -1,18 +1,20 @@
 package com.commilitio.medicalclinic.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
+
 import java.util.Set;
 
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class DoctorDto {
 
-    private Long id;
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String specialization;
-    private Set<Long> facilities;
-    private Set<PatientSimpleDto> patients;
+    private final Long id;
+    private final String email;
+    private final String firstName;
+    private final String lastName;
+    private final String specialization;
+    private final Set<Long> facilities;
+    private final Set<PatientSimpleDto> patients;
 }

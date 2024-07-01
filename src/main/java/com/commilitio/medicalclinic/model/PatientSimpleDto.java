@@ -1,15 +1,14 @@
 package com.commilitio.medicalclinic.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class PatientSimpleDto {
 
-    private Long id;
-    private String firstName;
-    private String lastName;
+    private final Long id;
+    private final String firstName;
+    private final String lastName;
 }

@@ -3,8 +3,8 @@ package com.commilitio.medicalclinic.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -23,6 +23,7 @@ public class Visit {
     private LocalDateTime visitEndTime;
     @ManyToOne
     @JoinColumn(name = "PATIENT_ID")
+    @EqualsAndHashCode.Exclude          // StackOverflow err
     private Patient patient;
     @ManyToOne
     @JoinColumn(name = "DOCTOR_ID")

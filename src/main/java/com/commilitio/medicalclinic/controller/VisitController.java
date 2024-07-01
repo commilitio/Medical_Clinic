@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,6 +31,16 @@ public class VisitController {
     @GetMapping
     public List<VisitDto> getVisits(Pageable pageable) {
         return visitService.getVisits(pageable);
+    }
+
+    @Operation(summary = "Get a list of available visits with a certain doctor's specialization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of visits",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = VisitDto.class)) })})
+    @GetMapping("/specialization")
+    public List<VisitDto> getVisitsBySpecialization(@RequestParam LocalDate visitDate, @RequestParam String specialization) {
+        return visitService.getVisitsBySpecialization(visitDate, specialization);
     }
 
     @Operation(summary = "Create a new visit")
