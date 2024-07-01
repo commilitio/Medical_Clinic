@@ -1,19 +1,18 @@
 package com.commilitio.medicalclinic.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+@ToString
 public class VisitDto {
 
-    private Long id;
-    private LocalDateTime visitStartTime;
-    private LocalDateTime visitEndTime;
-    private Long patientId;
-    private Long doctorId;
+    private final Long id;
+    private final LocalDateTime visitStartTime;
+    private final LocalDateTime visitEndTime;
+    private final Long patientId;
+    private final Long doctorId;
 }
