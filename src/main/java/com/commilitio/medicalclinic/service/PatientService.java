@@ -9,19 +9,21 @@ import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.PatientRepository;
 import com.commilitio.medicalclinic.repository.UserRepository;
 import com.commilitio.medicalclinic.repository.VisitRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+@Slf4j
+@Builder
 @RequiredArgsConstructor
 @Service
 public class PatientService {
@@ -63,14 +65,16 @@ public class PatientService {
         if (patientExists) {
             throw new PatientException("Patient already exists.", HttpStatus.CONFLICT);
         }
-        User user = new User();
-        user.setFirstName(patient.getUser().getFirstName());
-        user.setLastName(patient.getUser().getLastName());
-        user.setEmail(patient.getUser().getEmail());
-        user.setPassword(patient.getUser().getPassword());
+        User user = User.builder()
+                .firstName(patient.getUser().getFirstName())
+                .lastName(patient.getUser().getLastName())
+                .email(patient.getUser().getEmail())
+                .password(patient.getUser().getPassword())
+                .build();
 
         patient.setUser(user);
         Patient addedPatient = patientRepository.save(patient);
+        log.info("Created patient with data: {}", patient);
         return patientMapper.toDto(addedPatient);
     }
 
@@ -78,6 +82,7 @@ public class PatientService {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientException("Patient Not Found.", HttpStatus.NOT_FOUND));
         patientRepository.delete(patient);
+        log.info("Deleted patient with id: {}", id);
     }
 
     @Transactional
@@ -86,6 +91,7 @@ public class PatientService {
                 .orElseThrow(() -> new PatientException("Patient Not Found.", HttpStatus.NOT_FOUND));
         patientToUpdate.update(patient);
         Patient updatedPatient = patientRepository.save(patientToUpdate);
+        log.info("Updated patient with id {} with new data: {}", id, patient);
         return patientMapper.toDto(updatedPatient);
     }
 
@@ -95,6 +101,7 @@ public class PatientService {
                 .orElseThrow(() -> new PatientException("Patient Not Found.", HttpStatus.NOT_FOUND));
         patientToUpdate.getUser().setPassword(password);
         Patient updatedPatient = patientRepository.save(patientToUpdate);
+        log.info("Patient with id {} has updated password", id);
         return patientMapper.toDto(updatedPatient);
     }
 
@@ -117,6 +124,7 @@ public class PatientService {
         doctorRepository.save(doctor);
 
         visitRepository.save(visit);
+        log.info("Assigned patient with data: {}, to the visit with data: {}", patientToAssign, visit);
         return patientMapper.toDto(patientToAssign);
     }
 }

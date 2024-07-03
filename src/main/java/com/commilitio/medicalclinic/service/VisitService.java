@@ -10,18 +10,18 @@ import com.commilitio.medicalclinic.model.VisitDto;
 import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.VisitRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class VisitService {
@@ -35,7 +35,7 @@ public class VisitService {
         return visitMapper.toDtos(visits.toList());
     }
 
-    public List<VisitDto> getVisitsBySpecialization(LocalDate visitDate, String specialization){
+    public List<VisitDto> getVisitsBySpecialization(LocalDate visitDate, String specialization) {
         List<Visit> visits = visitRepository.getVisitsBySpecialization(visitDate, specialization);
         return visits.stream()
                 .map(visitMapper::toDto)
@@ -51,13 +51,15 @@ public class VisitService {
         Doctor doctor = doctorRepository.findById(visitCreateDto.getDoctorId())
                 .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
 
-        Visit createdVisit = new Visit();
-        createdVisit.setVisitStartTime(visitCreateDto.getVisitStartTime());
-        createdVisit.setVisitEndTime(visitCreateDto.getVisitEndTime());
-        createdVisit.setDoctor(doctor);
+        Visit createdVisit = Visit.builder()
+                .visitStartTime(visitCreateDto.getVisitStartTime())
+                .visitEndTime(visitCreateDto.getVisitEndTime())
+                .doctor(doctor)
+                .build();
 
         validateVisitMinutes(createdVisit);
         visitRepository.save(createdVisit);
+        log.info("Created visit with data: {}", createdVisit);
         return visitMapper.toDto(createdVisit);
     }
 

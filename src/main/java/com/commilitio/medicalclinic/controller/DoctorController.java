@@ -11,11 +11,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/doctors")
@@ -32,6 +34,7 @@ public class DoctorController {
                     content = @Content) })
     @GetMapping("/{id}")
     public DoctorDto getDoctor(@Parameter(description = "id of doctor to be searched") @PathVariable Long id) {
+        log.info("getDoctor method called with id: {}", id);
         return doctorService.getDoctor(id);
     }
 
@@ -44,6 +47,7 @@ public class DoctorController {
                     content = @Content) })
     @GetMapping
     public List<DoctorDto> getDoctors(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+        log.info("getDoctors method called with page: {}, and size: {}", page, size);
         return doctorService.getDoctors(page, size);
     }
 
@@ -56,6 +60,7 @@ public class DoctorController {
                     content = @Content) })
     @GetMapping("/{id}/visits")
     List<VisitDto> getDoctorAvailableVisits(@PathVariable Long id) {
+        log.info("getDoctorAvailableVisits method called with id: {}", id);
         return doctorService.getDoctorAvailableVisits(id);
     }
 
@@ -69,6 +74,7 @@ public class DoctorController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DoctorDto addDoctor(@RequestBody Doctor doctor) {
+        log.info("Creating doctor with data: {}", doctor);
         return doctorService.addDoctor(doctor);
     }
 
@@ -81,6 +87,7 @@ public class DoctorController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDoctor(@Parameter(description = "id of doctor to be deleted") @PathVariable Long id) {
+        log.info("Deleting doctor with id: {}", id);
         doctorService.deleteDoctor(id);
     }
 
@@ -95,6 +102,7 @@ public class DoctorController {
     public DoctorDto assignDoctorToFacility(
             @Parameter(description = "id of the doctor to be assigned") @PathVariable Long doctorId,
             @Parameter(description = "id of the facility to assign the doctor to") @PathVariable Long facilityId) {
+        log.info("Assigning doctor with id: {} to facility with id: {}", doctorId, facilityId);
         return doctorService.assignDoctorToFacility(doctorId, facilityId);
     }
 }

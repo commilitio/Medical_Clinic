@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @EqualsAndHashCode
 @ToString
+@Builder
 public class VisitCreateDto {
 
     private final Long doctorId;

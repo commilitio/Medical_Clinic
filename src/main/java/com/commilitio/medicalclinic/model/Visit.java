@@ -1,15 +1,16 @@
 package com.commilitio.medicalclinic.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@EqualsAndHashCode
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name = "VISIT")
 public class Visit {
@@ -28,4 +29,15 @@ public class Visit {
     @ManyToOne
     @JoinColumn(name = "DOCTOR_ID")
     private Doctor doctor;
+
+    @Override
+    public String toString() {
+        return "Visit{" +
+                "id=" + id +
+                ", visitStartTime=" + visitStartTime +
+                ", visitEndTime=" + visitEndTime +
+                ", patientId=" + (patient != null ? patient.getId() : null) +
+                ", doctorId=" + (doctor != null ? doctor.getId() : null) +
+                '}';
+    }
 }

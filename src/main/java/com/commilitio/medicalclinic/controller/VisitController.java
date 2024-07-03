@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/visits")
@@ -30,6 +32,7 @@ public class VisitController {
                             schema = @Schema(implementation = VisitDto.class)) })})
     @GetMapping
     public List<VisitDto> getVisits(Pageable pageable) {
+        log.info("getVisits method called with data: {}", pageable);
         return visitService.getVisits(pageable);
     }
 
@@ -40,6 +43,7 @@ public class VisitController {
                             schema = @Schema(implementation = VisitDto.class)) })})
     @GetMapping("/specialization")
     public List<VisitDto> getVisitsBySpecialization(@RequestParam LocalDate visitDate, @RequestParam String specialization) {
+        log.info("getVisitsBySpecialization method called with date of: {} and specialization of: {}", visitDate, specialization);
         return visitService.getVisitsBySpecialization(visitDate, specialization);
     }
 
@@ -57,6 +61,7 @@ public class VisitController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public VisitDto createVisit(@RequestBody VisitCreateDto visitCreateDto) {
+        log.info("Creating visit with data: {}", visitCreateDto);
         return visitService.createVisit(visitCreateDto);
     }
 }
