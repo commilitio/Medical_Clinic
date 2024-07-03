@@ -31,7 +31,7 @@ public class Patient {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_ID")
     private User user;
-    @ManyToMany(mappedBy = "patients")
+    @ManyToMany(mappedBy = "patients", cascade = {CascadeType.ALL})
     private Set<Doctor> doctors = new HashSet<>();
 
     public void update(Patient updatedPatient) {
@@ -48,7 +48,9 @@ public class Patient {
                 ", idCardNo='" + idCardNo + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", birthdate=" + birthdate +
-                ", visits=" + visits +
+                ", visits=" + visits.stream()
+                .map(visit -> visit.getId())
+                .collect(Collectors.toSet()) +
                 ", user=" + user +
                 ", doctors=" + doctors.stream()
                 .map(doctor -> String.format("Doctor{id=%d, firstName='%s', lastName='%s', specialization='%s'}",

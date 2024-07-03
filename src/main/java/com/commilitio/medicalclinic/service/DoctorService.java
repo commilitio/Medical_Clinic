@@ -9,14 +9,17 @@ import com.commilitio.medicalclinic.repository.DoctorRepository;
 import com.commilitio.medicalclinic.repository.FacilityRepository;
 import com.commilitio.medicalclinic.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class DoctorService {
@@ -60,14 +63,16 @@ public class DoctorService {
         if (doctorExists) {
             throw new DoctorException("Doctor already exists.", HttpStatus.CONFLICT);
         }
-        User user = new User();
-        user.setFirstName(doctor.getUser().getFirstName());
-        user.setLastName(doctor.getUser().getLastName());
-        user.setEmail(doctor.getUser().getEmail());
-        user.setPassword(doctor.getUser().getPassword());
+        User user = User.builder()
+                .firstName(doctor.getUser().getFirstName())
+                .lastName(doctor.getUser().getLastName())
+                .email(doctor.getUser().getEmail())
+                .password(doctor.getUser().getPassword())
+                .build();
 
         doctor.setUser(user);
         Doctor addedDoctor = doctorRepository.save(doctor);
+        log.info("Created doctor with data: {}", doctor);
         return doctorMapper.toDto(addedDoctor);
     }
 
@@ -75,10 +80,11 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
         doctorRepository.delete(doctor);
+        log.info("Deleted doctor with id: {}", id);
     }
 
     @Transactional
-    public DoctorDto assignDoctorToFacility(Long doctorId, Long facilityId){
+    public DoctorDto assignDoctorToFacility(Long doctorId, Long facilityId) {
         Doctor doctorToAssign = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new DoctorException("Doctor Not Found.", HttpStatus.NOT_FOUND));
         Facility facility = facilityRepository.findById(facilityId)
@@ -86,6 +92,7 @@ public class DoctorService {
 
         doctorToAssign.getFacilities().add(facility);
         doctorRepository.save(doctorToAssign);
+        log.info("Assigned doctor with data: {} to facility with data: {}", doctorToAssign, facility);
         return doctorMapper.toDto(doctorToAssign);
     }
 }
