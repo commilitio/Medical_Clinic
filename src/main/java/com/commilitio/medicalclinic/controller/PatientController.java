@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/patients")
@@ -31,6 +33,7 @@ public class PatientController {
                     content = @Content)})
     @GetMapping
     public List<PatientDto> getPatients(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+        log.info("getPatients method called with page: {}, and size: {}", page, size);
         return patientService.getPatients(page, size);
     }
 
@@ -43,6 +46,7 @@ public class PatientController {
                     content = @Content)})
     @GetMapping("/{id}")
     public PatientDto getPatient(@Parameter(description = "id of patient to be searched") @PathVariable Long id) {
+        log.info("getPatient method called with id: {}", id);
         return patientService.getPatient(id);
     }
 
@@ -55,6 +59,7 @@ public class PatientController {
                     content = @Content)})
     @GetMapping("/{id}/visits")
     public List<VisitDto> getPatientVisits(@Parameter(description = "id of patient to be searched") @PathVariable Long id) {
+        log.info("getPatientVisits method called with id: {}", id);
         return patientService.getPatientVisits(id);
     }
 
@@ -68,6 +73,7 @@ public class PatientController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PatientDto addPatient(@RequestBody Patient patient) {
+        log.info("Creating patient with data: {}", patient);
         return patientService.addPatient(patient);
     }
 
@@ -80,6 +86,7 @@ public class PatientController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePatient(@Parameter(description = "id of patient to be deleted") @PathVariable Long id) {
+        log.info("Deleting patient with id: {}", id);
         patientService.deletePatient(id);
     }
 
@@ -92,6 +99,7 @@ public class PatientController {
                     content = @Content)})
     @PutMapping("/{id}")
     public PatientDto updatePatient(@Parameter(description = "id of patient to be updated") @PathVariable Long id, @RequestBody Patient patient) {
+        log.info("Updating patient with id: {}, and data: {}", id, patient);
         return patientService.updatePatient(id, patient);
     }
 
@@ -104,6 +112,7 @@ public class PatientController {
                     content = @Content)})
     @PatchMapping("/{id}/password")
     public PatientDto updatePassword(@Parameter(description = "id of patient whose password has to be updated") @PathVariable Long id, @RequestBody String password) {
+        log.info("Updating password of patient with id: {}", id);
         return patientService.updatePassword(id, password);
     }
 
@@ -118,6 +127,7 @@ public class PatientController {
                     content = @Content)})
     @PatchMapping("/{id}/visits/{visitId}")
     public PatientDto assignPatientToVisit(@Parameter(description = "id of patient to be assigned") @PathVariable Long id, @Parameter(description = "id of visit to be assigned") @PathVariable Long visitId) {
+        log.info("Assigning patient with id: {} to visit with id: {}", id, visitId);
         return patientService.assignPatientToVisit(id, visitId);
     }
 }

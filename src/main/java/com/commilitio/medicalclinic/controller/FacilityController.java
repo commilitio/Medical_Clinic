@@ -10,11 +10,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/facilities")
@@ -31,6 +33,7 @@ public class FacilityController {
                     content = @Content)})
     @GetMapping("/{id}")
     public FacilityDto getFacility(@Parameter(description = "id of facility to be searched") @PathVariable Long id) {
+        log.info("getFacility method called with id: {}", id);
         return facilityService.getFacility(id);
     }
 
@@ -41,6 +44,7 @@ public class FacilityController {
                             schema = @Schema(implementation = FacilityDto.class))})})
     @GetMapping
     public List<FacilityDto> getFacilities(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "15") int size) {
+        log.info("getFacilities method called with page: {}, and size: {}", page, size);
         return facilityService.getFacilities(page, size);
     }
 
@@ -54,6 +58,7 @@ public class FacilityController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public FacilityDto addFacility(@RequestBody Facility facility) {
+        log.info("Creating facility with data: {}", facility);
         return facilityService.addFacility(facility);
     }
 
@@ -67,6 +72,7 @@ public class FacilityController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFacility(@Parameter(description = "id of facility to be deleted") @PathVariable Long id) {
+        log.info("Deleting facility with id: {}", id);
         facilityService.deleteFacility(id);
     }
 }

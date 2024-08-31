@@ -20,11 +20,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import static org.mockito.Mockito.when;
 
 public class VisitServiceTest {
@@ -85,17 +87,20 @@ public class VisitServiceTest {
 
         when(visitRepository.findAll(pageable)).thenReturn(visitPage);
 
-        VisitDto visitDto1 = new VisitDto();
-        visitDto1.setId(1L);
-        visitDto1.setVisitStartTime(visit1.getVisitStartTime());
-        visitDto1.setVisitEndTime(visit1.getVisitEndTime());
-        visitDto1.setDoctorId(doctor1.getId());
+        VisitDto visitDto1 = VisitDto.builder()
+                .id(1L)
+                .visitStartTime(visit1.getVisitStartTime())
+                .visitEndTime(visit1.getVisitEndTime())
+                .doctorId(doctor1.getId())
+                .build();
 
-        VisitDto visitDto2 = new VisitDto();
-        visitDto2.setId(2L);
-        visitDto2.setVisitStartTime(visit2.getVisitStartTime());
-        visitDto2.setVisitEndTime(visit2.getVisitEndTime());
-        visitDto2.setDoctorId(doctor2.getId());
+        VisitDto visitDto2 = VisitDto.builder()
+                .id(2L)
+                .visitStartTime(visit2.getVisitStartTime())
+                .visitEndTime(visit2.getVisitEndTime())
+                .doctorId(doctor2.getId())
+                .build();
+
         // when
         List<VisitDto> result = visitService.getVisits(pageable);
         // then
@@ -112,10 +117,11 @@ public class VisitServiceTest {
         LocalDateTime startTime = LocalDateTime.now().plusHours(1);
         LocalDateTime endTime = LocalDateTime.now().plusHours(2);
 
-        VisitCreateDto visitCreateDto = new VisitCreateDto();
-        visitCreateDto.setDoctorId(doctorId);
-        visitCreateDto.setVisitStartTime(startTime);
-        visitCreateDto.setVisitEndTime(endTime);
+        VisitCreateDto visitCreateDto = VisitCreateDto.builder()
+                .doctorId(doctorId)
+                .visitStartTime(startTime)
+                .visitEndTime(endTime)
+                .build();
         List<Visit> overlappingVisits = List.of(new Visit());
 
         when(visitRepository.checkIfVisitsOverlap(doctorId, startTime, endTime)).thenReturn(overlappingVisits);
@@ -195,21 +201,23 @@ public class VisitServiceTest {
     @Test
     void createVisit_CorrectData_ReturnCreatedVisit() {
         // given
-        VisitCreateDto visitCreateDto = new VisitCreateDto();
-        visitCreateDto.setDoctorId(1L);
         LocalDateTime startTime = LocalDateTime.now().plusHours(1).withMinute(0);
         LocalDateTime endTime = LocalDateTime.now().plusHours(2).withMinute(0);
-        visitCreateDto.setVisitStartTime(startTime);
-        visitCreateDto.setVisitEndTime(endTime);
+        VisitCreateDto visitCreateDto = VisitCreateDto.builder()
+                .doctorId(1L)
+                .visitStartTime(startTime)
+                .visitEndTime(endTime)
+                .build();
 
         Doctor doctor = new Doctor();
         doctor.setId(1L);
 
-        Visit createdVisit = new Visit();
-        createdVisit.setId(1L);
-        createdVisit.setVisitStartTime(startTime);
-        createdVisit.setVisitEndTime(endTime);
-        createdVisit.setDoctor(doctor);
+        Visit createdVisit = Visit.builder()
+                .id(1L)
+                .visitStartTime(startTime)
+                .visitEndTime(endTime)
+                .doctor(doctor)
+                .build();
 
         when(doctorRepository.findById(visitCreateDto.getDoctorId())).thenReturn(Optional.of(doctor));
         when(visitRepository.save(createdVisit)).thenReturn(createdVisit);

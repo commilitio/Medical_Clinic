@@ -6,6 +6,7 @@ import com.commilitio.medicalclinic.model.Facility;
 import com.commilitio.medicalclinic.model.FacilityDto;
 import com.commilitio.medicalclinic.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FacilityService {
@@ -43,6 +45,7 @@ public class FacilityService {
             throw new FacilityException("Facility already exists.", HttpStatus.CONFLICT);
         }
         Facility addedFacility = facilityRepository.save(facility);
+        log.info("Created facility with data: {}", facility);
         return facilityMapper.toDto(addedFacility);
     }
 
@@ -50,5 +53,6 @@ public class FacilityService {
         Facility facility = facilityRepository.findById(id)
                 .orElseThrow(() -> new FacilityException("Facility Not Found.", HttpStatus.NOT_FOUND));
         facilityRepository.delete(facility);
+        log.info("Deleted facity with id: {}", id);
     }
 }

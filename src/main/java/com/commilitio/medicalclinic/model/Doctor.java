@@ -20,7 +20,7 @@ public class Doctor {
     private Long id;
     @Column(nullable = false, name = "SPECIALIZATION")
     private String specialization;
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = {CascadeType.ALL})
     private Set<Visit> visits = new HashSet<>();
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_ID")
